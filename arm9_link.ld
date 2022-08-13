@@ -10,30 +10,77 @@ MEMORY {
     itcm  (wx) : ORIGIN = 0x01000000, LENGTH = 32K
 }
 
+__svc_stack = ORIGIN(dtcm) + LENGTH(dtcm);
+__irq_stack = __svc_stack - 0x100;
+__usr_stack = __irq_stack - 0x100;
+
+/* https://sourceware.org/binutils/docs/ld/PHDRS.html */
+/* https://refspecs.linuxbase.org/elf/gabi4+/ch5.pheader.html#p_flags */
+/* 7 flag = read, write and execute */
+/* use same segment names as devkitarm, to (hopefully) be compatible with ndstool */
+PHDRS {
+    main PT_LOAD FLAGS(7);
+    dtcm PT_LOAD FLAGS(7);
+    itcm PT_LOAD FLAGS(7);
+}
+
 SECTIONS {
-    /* where code goes */
+	/* Secure area. usually 0 filled for 2048 bytes */
+	/* https://problemkaputt.de/gbatek.htm#dscartridgesecurearea */
+	.secure : {
+		KEEP(*(.secure));
+	} > ewram : main = 0x00
+
+    /* where EWRAM resident code goes */
     .text : {
         *(.text*);
         . = ALIGN(4);
-    } > ewram = 0xff /* this means 0xFF is used for padding, I think? */
+    } > ewram : main = 0xff /* this means 0xFF is used for padding, I think? */
 
     /* read only stuff, like string literals */
     .rodata : {
         *(.rodata*);
         . = ALIGN(4);
-    } > ewram = 0xff
+    } > ewram : main = 0xff
 
     /* initialised variables */
     .data : {
-        *(.data*)
+        *(.data*);
         . = ALIGN(4);
-    } > ewram = 0xff
+    } > ewram : main = 0xff
 
     /* uninitialised variables */
-    .bss : {
-        *(.bss*)
+	/* NOLOAD makes the section not loaded at runtime, so it doesn't occupy ROM */
+    .bss (NOLOAD) : {
+		__bss_start = ABSOLUTE(.);
+        *(.bss*);
         . = ALIGN(4);
-    } > ewram
+		__bss_end = ABSOLUTE(.);
+		__heap_start = ABSOLUTE(.);
+    } > ewram : main
+	__bss_size = __bss_end - __bss_start;
+	__heap_end = ORIGIN(ewram) + LENGTH(ewram);
+	__heap_size = __heap_end - __heap_start;
+
+    /* stuff loaded into ITCM */
+    /* LMA = address in EWRAM, VMA = address in ITCM */
+    .itcm : {
+        __itcm_lma = LOADADDR(.itcm);
+        __itcm_start = ABSOLUTE(.); /* VMA */
+        *(.itcm*);
+        . = ALIGN(4);
+        __itcm_end = ABSOLUTE(.);
+    } > itcm AT> ewram : itcm = 0xff
+    __itcm_size = __itcm_end - __itcm_start;
+
+    .dtcm : {
+        __dtcm_lma = LOADADDR(.dtcm);
+        __dtcm_start = ABSOLUTE(.); /* VMA */
+        *(.dtcm*);
+        . = ALIGN(4);
+        __dtcm_end = ABSOLUTE(.);
+    } > dtcm AT> ewram : dtcm = 0xff
+    __dtcm_size = __dtcm_end - __dtcm_start;
 
     /* debugging sections */
     /* Stabs */
