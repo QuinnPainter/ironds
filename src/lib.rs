@@ -15,7 +15,7 @@ use interrupt::disable_interrupts_master;
 //use crate::debug::nocash;
 
 pub mod runtime;
-pub mod debugging;
+pub mod nocash;
 pub mod interrupt;
 pub mod timers;
 

@@ -98,15 +98,16 @@ __start:
     ldr r1, =__bss_size
     bl zero_mem
 
+    ldr r4, =__aeabi_memcpy
     ldr r0, =__itcm_start /* Copy ITCM from LMA to VMA */
     ldr r1, =__itcm_lma
     ldr r2, =__itcm_size
-    blx __aeabi_memcpy
+    blx r4
 
     ldr r0, =__dtcm_start /* Copy DTCM from LMA to VMA */
     ldr r1, =__dtcm_lma
     ldr r2, =__dtcm_size
-    blx __aeabi_memcpy
+    blx r4
 
     ldr r0, =lib_init
     blx r0
