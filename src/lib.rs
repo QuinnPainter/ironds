@@ -11,11 +11,13 @@
 //static ALLOCATOR: Heap = Heap::empty();
 
 //use interrupt::critical_section;
+use interrupt::disable_interrupts_master;
 //use crate::debug::nocash;
 
 pub mod runtime;
 pub mod debugging;
 pub mod interrupt;
+pub mod timers;
 
 extern "C" {
     static __heap_start: *mut u8;
@@ -32,6 +34,7 @@ extern "C" fn lib_init() {
 
 #[panic_handler]
 fn panic(_info: &core::panic::PanicInfo) -> ! {
+    disable_interrupts_master!();
     //let mut output = String::new();
 	//fmt::write(&mut output, format_args!("{}", _info));
     loop {}
