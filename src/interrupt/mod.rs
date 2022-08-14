@@ -6,8 +6,8 @@
 // these are macros and not functions, so that they will be inlined for both ARM and THUMB
 macro_rules! enable_interrupts_master {
     () => {{
-        use core::ptr; // 0x04000208 = IME Addr (same for ARM9 / ARM7)
-        unsafe { ptr::write_volatile(0x04000208 as *mut u32, 1); }
+        use core::ptr;
+        unsafe { ptr::write_volatile($crate::addr::IME as *mut u32, 1); }
     }}
 }
 pub(crate) use enable_interrupts_master;
@@ -15,7 +15,7 @@ pub(crate) use enable_interrupts_master;
 macro_rules! disable_interrupts_master {
     () => {{
         use core::ptr;
-        unsafe { ptr::write_volatile(0x04000208 as *mut u32, 0); }
+        unsafe { ptr::write_volatile($crate::addr::IME as *mut u32, 0); }
     }}
 }
 pub(crate) use disable_interrupts_master;
@@ -23,7 +23,7 @@ pub(crate) use disable_interrupts_master;
 macro_rules! is_ime_enabled {
     () => {{
         use core::ptr;
-        unsafe { ((ptr::read_volatile(0x04000208 as *mut u32) & 1) == 1) }
+        unsafe { ((ptr::read_volatile($crate::addr::IME as *mut u32) & 1) == 1) }
     }}
 }
 pub(crate) use is_ime_enabled;
