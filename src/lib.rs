@@ -1,6 +1,7 @@
 #![no_std]
 //#![feature(default_alloc_error_handler)]
 #![allow(unused_macros, unused_imports)]
+#![feature(decl_macro)]
 
 //extern crate alloc;
 //use alloc::string::String;
