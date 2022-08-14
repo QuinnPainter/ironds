@@ -7,3 +7,8 @@ edition = "2021"
 
 [dependencies]
 voladdress = { version = "1" }
+bitflags = { version = "1.3" }
+
+[features]
+arm9 = []
+arm7 = []

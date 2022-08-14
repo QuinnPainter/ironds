@@ -1,4 +1,18 @@
 
+// https://www.problemkaputt.de/gbatek.htm#dsvideostuff
+#[cfg(feature = "arm9")]
+pub const MASTER_BRIGHT: usize = 0x0400006C;
+#[cfg(feature = "arm9")]
+pub const DISPCNT: usize = 0x04000000;
+pub const DISPSTAT: usize = 0x04000004;
+pub const VCOUNT: usize = 0x04000006;
+
+// https://www.problemkaputt.de/gbatek.htm#dsvideocaptureandmainmemorydisplaymode
+#[cfg(feature = "arm9")]
+pub const DISPCAPCNT: usize = 0x04000064;
+#[cfg(feature = "arm9")]
+pub const DISP_MMEM_FIFO: usize = 0x04000068;
+
 // https://www.problemkaputt.de/gbatek.htm#dsdmatransfers
 pub const DMA0SAD: usize = 0x040000B0;
 pub const DMA1SAD: usize = 0x040000BC;

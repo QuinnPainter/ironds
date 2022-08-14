@@ -21,7 +21,9 @@ use interrupt::disable_interrupts_master;
 pub mod runtime;
 pub mod nocash;
 pub mod interrupt;
+pub mod display;
 pub mod timers;
+pub mod addr;
 
 extern "C" {
     static __heap_start: *mut u8;
