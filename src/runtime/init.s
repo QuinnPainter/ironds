@@ -4,7 +4,7 @@
 
     .global __start
 
-    /* note - all double underscore symbols (other than __start)
+    /* note - many of the double underscore symbols
        are defined in the linkerscript */
 
     .section .text.rt0
@@ -28,6 +28,12 @@ __start:
     mov	r0, #0x1F /* Switch to System Mode */
     msr	cpsr, r0
     ldr	sp, =__usr_stack /* Set user / system stack */
+
+    /* Assign all 32K of IWRAM to the ARM7 */
+    /* https://www.problemkaputt.de/gbatek.htm#dsmemorycontrolwram */
+    mov r0, #3
+    ldr r1, =0x04000247
+    strb r0, [r1]
 
     /* Cache / TCM / Memory Protection Unit Init */
     /* https://www.problemkaputt.de/gbatek.htm#armcp15systemcontrolcoprocessor */
@@ -96,18 +102,17 @@ __start:
     /* Init the code / data regions */
     ldr r0, =__bss_start /* Clear BSS */
     ldr r1, =__bss_size
-    bl zero_mem
+    bl __init_zero_mem
 
-    ldr r4, =__aeabi_memcpy
     ldr r0, =__itcm_start /* Copy ITCM from LMA to VMA */
     ldr r1, =__itcm_lma
     ldr r2, =__itcm_size
-    blx r4
+    bl __init_memcpy
 
     ldr r0, =__dtcm_start /* Copy DTCM from LMA to VMA */
     ldr r1, =__dtcm_lma
     ldr r2, =__dtcm_size
-    blx r4
+    bl __init_memcpy
 
     ldr r0, =lib_init
     blx r0
@@ -119,9 +124,9 @@ __start:
 
 
 /*  Set a block of memory to 0
-    r0 = Start Address
+    r0 = Start Address (assumed to be 32 bit aligned)
     r1 = Length (bytes) */
-zero_mem:
+__init_zero_mem:
     add r1, r1, #3  /* round up if misaligned */
     bics r1, r1, #3 /* make sure length is aligned, clear last 2 bits */
     bxeq lr         /* quit if length is 0 */
@@ -131,4 +136,18 @@ zero_mem:
     str r2, [r0], #4
     subs r1, r1, #4
     bne .lp
+    bx lr
+
+/* Simple bytewise memcpy (could optimise this, but it's not critical as it's only used for init)
+   r0 = Dest Address
+   r1 = Source Address
+   r2 = Length (bytes) */
+__init_memcpy:
+    cmp r2, #0
+    bxeq lr /* quit if length is 0 */
+
+2:  ldrb r3, [r1], #1
+    strb r3, [r0], #1
+    subs r2, r2, #1
+    bne 2b
     bx lr
