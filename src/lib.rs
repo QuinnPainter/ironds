@@ -2,6 +2,7 @@
 //#![feature(default_alloc_error_handler)]
 #![allow(unused_macros, unused_imports)]
 #![feature(decl_macro)]
+#![feature(isa_attribute)]
 
 #[cfg(all(feature = "arm9", feature = "arm7"))]
 compile_error!("feature \"arm9\" and feature \"arm7\" cannot be enabled at the same time");
