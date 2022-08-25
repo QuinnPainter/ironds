@@ -1,11 +1,8 @@
 /* See the "Debug Messages" section of the NO$GBA help for more detail. */
 /* (the website is outdated, view it in the actual app) */
 use core::arch::asm;
+use core::ptr::write_volatile;
 use crate::addr;
-use voladdress::*;
-
-// this reg is really 8 bit in no$gba, but melonds won't accept it unless it's treated as 32 bit
-const CHAR_OUT: VolAddress<u32, (), Safe> = unsafe { VolAddress::new(addr::NOCASH_CHAROUT) };
 
 // Works in NO$GBA, melonDS and DeSmuME
 #[instruction_set(arm::a32)]
@@ -42,7 +39,8 @@ pub fn print (s: &str) {
 // this is faster, but you should probably use "print" instead. this is just included for posterity.
 pub fn print2 (s: &str) {
     for b in s.bytes() {
-        CHAR_OUT.write(b as u32);
+        // this reg is really 8 bit in no$gba, but melonds won't accept it unless it's treated as 32 bit
+        unsafe { write_volatile(addr::NOCASH_CHAROUT as *mut u32, b as u32); }
     }
 }
 
