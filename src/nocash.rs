@@ -36,7 +36,7 @@ pub fn print (s: &str) {
 }
 
 // Works in NO$GBA and (soon?) melonDS
-// this is faster, but you should probably use "print" instead. this is just included for posterity.
+// you should probably use "print" instead, as it is more compatible. this is just included for posterity.
 pub fn print2 (s: &str) {
     for b in s.bytes() {
         // this reg is really 8 bit in no$gba, but melonds won't accept it unless it's treated as 32 bit

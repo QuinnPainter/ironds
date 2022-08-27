@@ -31,8 +31,15 @@ extern "C" {
     static __heap_size: usize;
 }
 
+// this function is called from init.s, before main.
+// interrupts are disabled at this point, so no need to worry about thread-safety
 #[no_mangle]
 extern "C" fn lib_init() {
+    // turn on all graphics engines
+    display::power_on(display::GfxPwr::ALL);
+    // set brightness to default level
+    display::set_brightness(display::GfxEngine::MAIN, 0);
+    display::set_brightness(display::GfxEngine::SUB, 0);
     //critical_section!({ nocash::print("stuff"); });
     //unsafe {
     //    ALLOCATOR.lock().init(__heap_start, __heap_size);
