@@ -22,6 +22,7 @@ use interrupt::disable_interrupts_master;
 pub mod runtime;
 pub mod nocash;
 pub mod interrupt;
+pub mod allocator;
 pub mod display;
 pub mod timers;
 pub mod addr;
