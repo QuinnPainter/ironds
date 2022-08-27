@@ -26,68 +26,68 @@ bitflags! {
 #[bitfield]
 #[repr(u32)]
 pub struct DisplayControlMain {
-    bg_mode: B3, // enum
-    bg0_3d: bool,
-    tile_obj_mapping: bool, // enum
-    bm_obj_2d_dim: bool, // enum
-    bm_obj_mapping: bool, // enum
-    forced_blank: bool,
-    display_bg0: bool,
-    display_bg1: bool,
-    display_bg2: bool,
-    display_bg3: bool,
-    display_obj: bool,
-    display_win0: bool,
-    display_win1: bool,
-    display_obj_win: bool,
-    display_mode: B2, // enum
-    vram_display_block: B2, // enum
-    tile_obj_1d_bound: B2,
-    bm_obj_1d_bound: B1,
-    obj_during_hblank: bool,
-    master_tiledata_base: B3,
-    master_tilemap_base: B3,
-    bg_ext_pal_enabled: bool,
-    obj_ext_pal_enabled: bool,
+    pub bg_mode: B3, // enum
+    pub bg0_3d: bool,
+    pub tile_obj_mapping: bool, // enum
+    pub bm_obj_2d_dim: bool, // enum
+    pub bm_obj_mapping: bool, // enum
+    pub forced_blank: bool,
+    pub display_bg0: bool,
+    pub display_bg1: bool,
+    pub display_bg2: bool,
+    pub display_bg3: bool,
+    pub display_obj: bool,
+    pub display_win0: bool,
+    pub display_win1: bool,
+    pub display_obj_win: bool,
+    pub display_mode: B2, // enum
+    pub vram_display_block: B2, // enum
+    pub tile_obj_1d_bound: B2,
+    pub bm_obj_1d_bound: B1,
+    pub obj_during_hblank: bool,
+    pub master_tiledata_base: B3,
+    pub master_tilemap_base: B3,
+    pub bg_ext_pal_enabled: bool,
+    pub obj_ext_pal_enabled: bool,
 }
 
 #[bitfield]
 #[repr(u32)]
 pub struct DisplayControlSub {
-    bg_mode: B3, // enum (different)
+    pub bg_mode: B3, // enum (different)
     #[skip] __: bool,
-    tile_obj_mapping: bool, // enum
-    bm_obj_2d_dim: bool, // enum
-    bm_obj_mapping: bool, // enum
-    forced_blank: bool,
-    display_bg0: bool,
-    display_bg1: bool,
-    display_bg2: bool,
-    display_bg3: bool,
-    display_obj: bool,
-    display_win0: bool,
-    display_win1: bool,
-    display_obj_win: bool,
-    display_mode: B2, // enum (different)
+    pub tile_obj_mapping: bool, // enum
+    pub bm_obj_2d_dim: bool, // enum
+    pub bm_obj_mapping: bool, // enum
+    pub forced_blank: bool,
+    pub display_bg0: bool,
+    pub display_bg1: bool,
+    pub display_bg2: bool,
+    pub display_bg3: bool,
+    pub display_obj: bool,
+    pub display_win0: bool,
+    pub display_win1: bool,
+    pub display_obj_win: bool,
+    pub display_mode: B2, // enum (different)
     #[skip] __: B2,
-    tile_obj_1d_bound: B2,
+    pub tile_obj_1d_bound: B2,
     #[skip] __: B1,
-    obj_during_hblank: bool,
+    pub obj_during_hblank: bool,
     #[skip] __: B6,
-    bg_ext_pal_enabled: bool,
-    obj_ext_pal_enabled: bool,
+    pub bg_ext_pal_enabled: bool,
+    pub obj_ext_pal_enabled: bool,
 }
 
 #[bitfield]
 #[repr(u16)]
 pub struct BackgroundControl {
-    priority: B2, // lower = higher priority
-    tiledata_base: B4,
-    mosaic_enabled: bool,
-    palette_setting: B1, // enum
-    tilemap_base: B5,
-    bit13: B1, // BG0/BG1 = Ext Palette Slot. BG2/BG3 = Display Area Overflow (0=Transparent, 1=Wraparound)
-    screen_size: B2,
+    pub priority: B2, // lower = higher priority
+    pub tiledata_base: B4,
+    pub mosaic_enabled: bool,
+    pub palette_setting: B1, // enum
+    pub tilemap_base: B5,
+    pub bit13: B1, // BG0/BG1 = Ext Palette Slot. BG2/BG3 = Display Area Overflow (0=Transparent, 1=Wraparound)
+    pub screen_size: B2,
 }
 
 pub enum MainEnginePos {
