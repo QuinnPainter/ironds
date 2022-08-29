@@ -1,4 +1,4 @@
-use core::ptr::{read_volatile, write_volatile};
+use core::ptr::write_volatile;
 use crate::addr;
 
 // https://www.problemkaputt.de/gbatek.htm#dsmemorycontrolvram

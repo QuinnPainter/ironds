@@ -1,35 +1,40 @@
 #![no_std]
-//#![feature(default_alloc_error_handler)]
-#![allow(unused_macros, unused_imports)]
 #![feature(decl_macro)]
 #![feature(isa_attribute)]
+#![feature(alloc_error_handler)]
 
 #[cfg(all(feature = "arm9", feature = "arm7"))]
 compile_error!("feature \"arm9\" and feature \"arm7\" cannot be enabled at the same time");
 
-//extern crate alloc;
-//use alloc::string::String;
-//use core::fmt;
-//use linked_list_allocator::Heap;
+extern crate alloc;
+use alloc::string::String;
+use core::fmt::Write;
 
-//#[global_allocator]
-//static ALLOCATOR: Heap = Heap::empty();
-
-//use interrupt::critical_section;
-use interrupt::disable_interrupts_master;
-//use crate::debug::nocash;
+#[global_allocator]
+#[link_section = ".dtcm"]
+static mut ALLOCATOR: allocator::ACSLAlloc = allocator::ACSLAlloc::new();
 
 pub mod runtime;
 pub mod nocash;
 pub mod interrupt;
 pub mod allocator;
+#[cfg(feature = "arm9")]
 pub mod display;
 pub mod timers;
 pub mod addr;
 
-extern "C" {
-    static __heap_start: *mut u8;
-    static __heap_size: usize;
+// Accessing variables from the linkerscript is weird.
+// https://stackoverflow.com/questions/72820626/how-to-access-a-variable-from-linker-script-in-rust-code?noredirect=1&lq=1
+#[inline(always)]
+fn heap_start() -> *mut u8 {
+    extern "C" { static __heap_start: *mut u8; }
+    unsafe { &__heap_start as *const _ as *mut u8 }
+}
+
+#[inline(always)]
+fn heap_size() -> usize {
+    extern "C" { static __heap_size: usize; }
+    unsafe { &__heap_size as *const _ as usize }
 }
 
 // this function is called from init.s, before main.
@@ -37,20 +42,53 @@ extern "C" {
 #[no_mangle]
 extern "C" fn lib_init() {
     // turn on all graphics engines
-    display::power_on(display::GfxPwr::ALL);
-    // set brightness to default level
-    display::set_brightness(display::GfxEngine::MAIN, 0);
-    display::set_brightness(display::GfxEngine::SUB, 0);
-    //critical_section!({ nocash::print("stuff"); });
-    //unsafe {
-    //    ALLOCATOR.lock().init(__heap_start, __heap_size);
-    //}
+    #[cfg(feature = "arm9")]
+    {
+        display::power_on(display::GfxPwr::ALL);
+        // set brightness to default level
+        display::set_brightness(display::GfxEngine::MAIN, 0);
+        display::set_brightness(display::GfxEngine::SUB, 0);
+    }
+    unsafe { ALLOCATOR.init(heap_start(), heap_size()); }
 }
 
 #[panic_handler]
-fn panic(_info: &core::panic::PanicInfo) -> ! {
-    disable_interrupts_master!();
-    //let mut output = String::new();
-	//fmt::write(&mut output, format_args!("{}", _info));
+fn panic(info: &core::panic::PanicInfo) -> ! {
+    // concat! doesn't like const strings, this works as a workaround
+    macro_rules! ERR_HEADER { () => { "        ---- PANIC! ----\n\n" }; }
+
+    interrupt::disable_interrupts_master!();
+    let mut output: String = String::new();
+    let printed_output: &str;
+    // Reserve enough chars to fill the screen
+    if output.try_reserve_exact(32 * 24).is_err() {
+        printed_output = concat!(ERR_HEADER!(), "Allocation failed: Out of memory");
+    }
+    else {
+        printed_output = match write!(&mut output, "{}", info) {
+            Ok(_) => { output.insert_str(0, ERR_HEADER!()); output.as_str() },
+            Err(_) => concat!(ERR_HEADER!(), "Error formatting panic message.\nHow did this happen?"),
+        };
+    }
+    #[cfg(feature = "arm9")]
+    {
+        display::console::init_default();
+        display::console::print(printed_output);
+        // arm9 panic should send message to halt arm7?
+    }
+    // todo: arm7 panic should send message to arm9 to display message
     loop {}
 }
+
+#[alloc_error_handler]
+fn alloc_error(layout: core::alloc::Layout) -> ! {
+    panic!("memory allocation of {} bytes failed", layout.size())
+}
+
+// why are these needed??? rust shouldn't be calling C++ exception unwinding code
+// can be fixed by enabling lto, maybe? https://blog.bokuweb.me/entry/2020/04/14/101202
+#[no_mangle]
+pub fn __aeabi_unwind_cpp_pr0() {}
+
+#[no_mangle]
+pub fn __aeabi_unwind_cpp_pr1() {}

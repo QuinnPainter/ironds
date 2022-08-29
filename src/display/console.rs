@@ -46,7 +46,8 @@ pub fn init_default() {
         core::ptr::write_bytes((0x6200000 + 8192) as *mut u16, 32, 32 * 24);
 
         // load font into sub-bg VRAM
-        core::ptr::copy_nonoverlapping(DEFAULT_FONT.as_ptr(), 0x06200000 as *mut u8, DEFAULT_FONT.len());
+        // vram doesn't support 8 bit loads, must load as 16 bit
+        core::ptr::copy_nonoverlapping(DEFAULT_FONT.as_ptr() as *const u16, 0x06200000 as *mut u16, DEFAULT_FONT.len() / 2);
 
         // load palette into sub-bg palette RAM
         core::ptr::copy_nonoverlapping(DEFAULT_PALETTE.as_ptr(), 
@@ -79,6 +80,7 @@ pub fn print(txt: &str) {
     }
 }
 
+#[must_use]
 #[inline(always)]
 pub fn get_cursor_pos() -> (u8, u8) {
     unsafe { (CURSOR_X, CURSOR_Y) }
