@@ -50,7 +50,7 @@ pub fn init_default() {
         core::ptr::copy_nonoverlapping(DEFAULT_FONT.as_ptr() as *const u16, 0x06200000 as *mut u16, DEFAULT_FONT.len() / 2);
 
         // load palette into sub-bg palette RAM
-        core::ptr::copy_nonoverlapping(DEFAULT_PALETTE.as_ptr(), 
+        core::ptr::copy_nonoverlapping(DEFAULT_PALETTE.as_ptr(),
             0x05000400 as *mut u16, DEFAULT_PALETTE.len() * size_of::<u16>());
     }
 }

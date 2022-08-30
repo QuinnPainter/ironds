@@ -11,7 +11,7 @@ use alloc::string::String;
 use core::fmt::Write;
 
 #[global_allocator]
-#[link_section = ".dtcm"]
+#[link_section = ".dtcm.alloc"]
 static mut ALLOCATOR: allocator::ACSLAlloc = allocator::ACSLAlloc::new();
 
 pub mod runtime;
@@ -22,6 +22,7 @@ pub mod allocator;
 pub mod display;
 pub mod timers;
 pub mod addr;
+pub mod agbabi;
 
 // Accessing variables from the linkerscript is weird.
 // https://stackoverflow.com/questions/72820626/how-to-access-a-variable-from-linker-script-in-rust-code?noredirect=1&lq=1

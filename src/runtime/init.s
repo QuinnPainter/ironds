@@ -132,10 +132,9 @@ __init_zero_mem:
     bxeq lr         /* quit if length is 0 */
 
     mov r2, #0
-.lp:
-    str r2, [r0], #4
+3:  str r2, [r0], #4
     subs r1, r1, #4
-    bne .lp
+    bne 3b
     bx lr
 
 /* Simple bytewise memcpy (could optimise this, but it's not critical as it's only used for init)

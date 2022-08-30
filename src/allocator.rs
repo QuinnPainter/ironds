@@ -30,7 +30,7 @@ pub struct ACSLAlloc {
 unsafe impl Sync for ACSLAlloc {}
 
 unsafe impl GlobalAlloc for ACSLAlloc {
-    #[link_section = ".itcm"]
+    #[link_section = ".itcm.alloc"]
     #[instruction_set(arm::a32)]
     #[inline(never)]
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
@@ -57,7 +57,7 @@ unsafe impl GlobalAlloc for ACSLAlloc {
                 "cmp    r5,r12",    // end of memory?
                 "bhs    2f",
 
-            "1:", // gmNextFree
+            "5:", // gmNextFree
                 "add    r2,r5,4",       // R2 = ^Last or place where ^Last is
                 "ldr    r1,[r5]",       // R1 = pointer to next free block
                 "tst    r1,1",          // Bit 0: islarge flag
@@ -72,7 +72,7 @@ unsafe impl GlobalAlloc for ACSLAlloc {
                 "mov    r4,r5",         // R4 = previous block pointer
                 "mov    r5,r1",         // R5 = pointer to new block
                 "cmp    r5,r12",        // Last block?
-                "bls    1b",            // No, keep searching
+                "bls    5b",            // No, keep searching
 
             "2:", // gmError
                 "subs   r0,r0",     // Return null pointer and CF=1
@@ -116,7 +116,7 @@ unsafe impl GlobalAlloc for ACSLAlloc {
         allocated_addr as *mut u8
     }
 
-    #[link_section = ".itcm"]
+    #[link_section = ".itcm.dealloc"]
     #[instruction_set(arm::a32)]
     #[inline(never)]
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {

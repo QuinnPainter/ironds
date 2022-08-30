@@ -6,8 +6,8 @@ ENTRY(__start)
 MEMORY {
     /* 512k reserved for the ARM7 */
     ewram (wx) : ORIGIN = 0x02000000, LENGTH = 4M - 512k
-    dtcm  (w)  : ORIGIN = 0x02ff0000, LENGTH = 16K
     itcm  (wx) : ORIGIN = 0x01000000, LENGTH = 32K
+    dtcm  (w)  : ORIGIN = 0x02ff0000, LENGTH = 16K
 }
 
 __svc_stack = ORIGIN(dtcm) + LENGTH(dtcm);
@@ -20,8 +20,8 @@ __usr_stack = __irq_stack - 0x100;
 /* use same segment names as devkitarm, to (hopefully) be compatible with ndstool */
 PHDRS {
     main PT_LOAD FLAGS(7);
-    dtcm PT_LOAD FLAGS(7);
     itcm PT_LOAD FLAGS(7);
+    dtcm PT_LOAD FLAGS(7);
 }
 
 SECTIONS {
@@ -61,6 +61,11 @@ SECTIONS {
 	__bss_size = __bss_end - __bss_start;
 	__heap_end = ORIGIN(ewram) + LENGTH(ewram);
 	__heap_size = __heap_end - __heap_start;
+
+    /* since heap is defined before ITCM and DTCM, they will overlap. */
+    /* this should be fine, as the EWRAM LMAs are no longer needed */
+    /* after they have been loaded into ITCM and DTCM. */
+    /* hopefully this isn't a stupid idea? */
 
     /* stuff loaded into ITCM */
     /* LMA = address in EWRAM, VMA = address in ITCM */
