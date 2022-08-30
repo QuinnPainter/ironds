@@ -119,8 +119,99 @@ unsafe impl GlobalAlloc for ACSLAlloc {
     #[link_section = ".itcm.dealloc"]
     #[instruction_set(arm::a32)]
     #[inline(never)]
-    unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
-
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        debug_assert!(!self.free_list.is_null(), "tried to deallocate before allocator init");
+        critical_section!({
+            asm!(
+                // Check the free block list, to see what blocks we need to modify.
+                // The error checks have been disabled for speed.
+            
+                "adds   r1,3",       // Round up to a multiple of 4 part 1/2
+                "bcs    6f",         // If carry then len was > FFFFFFFC
+                                     // and would cause a wraparound -> Err
+                "bics   r1,3",       // Round up to 4-byte multiple part 2/2
+                "beq    6f",         // Zero size -> Return
+            
+                "add    r1,r0",      // R1 = end of block to free
+                "bcs    6f",         // An overflow here would be a tragedy.
+                "mov    r2,r5",
+            
+                // Keep a delayed pointer and follow the chain
+            "2:",
+                "mov    r3,r2",      // R3 = Delayed pointer to cur.free blk
+                "ldr    r2,[r2]",    // R2 = Current free block
+                "bic    r2,1",       // Clear islarge flag
+                "cmp    r1,r2",      // target blk end <= current blk start?
+                "bhi    2b",         // no, keep searching
+                // It's impossible under normal conditions that r1 > HeapEnd
+                // therefore the check that r1 <= r2 suffices for termination,
+                // no need to check for HeapEnd.
+            
+                // We need to add a block between the previous block (in R3)
+                // and the current block (in R2).
+            
+                // First, check if there's a block before us that is contiguous
+                // to us. If so, it needs to be extended rather than creating one.
+                "cmp    r3,r5",      // is there a previous block?
+                "beq    3f",         // if not, we don't need to merge it
+            
+                // Previous block present. Check if we need to add ourselves
+                // to it, by checking if the end of the block = ourselves.
+                // If not, we need to create a new one too.
+                "ldrh   r4,[r3]",    // get previous block's islarge flag
+                "tst    r4,1",       // set?
+                "add    r4,r3,4",    // prepare end = start + 4
+                "ldrne  r4,[r4]",    // read ptr to last if bit set
+    
+                // We now have the end of the previous block in R4; if it
+                // doesn't equal the block to free, create a new one.
+                "cmp    r4,r0",       // does the block end at this one?
+                "moveq  r0,r3",       // move block pointer if so
+                "beq    4f",          // don't create new block if so
+            
+                // Create a new head
+            "3:", // fmNoMergeHead
+                "ldrh   r4,[r3]",     // get previous islarge flag
+                "and    r4,1",        // isolate it
+                "orr    r4,r0",       // merge flag w/ initial block address
+                "str    r4,[r3]",     // update last block's next ptr to point to us
+            
+            "4:", // fmCheckLast
+                "mov    r5,r12",
+                "cmp    r2,r5",       // if next = HeapEnd, don't merge
+                "beq    5f",
+                "cmp    r1,r2",       // are we touching the next block?
+                "beq    7f",          // merge both if so
+            
+                // Adjust islarge in R2 and store it in [R0], and R1 in [R0+4].
+            "5:", // fmNoMergeTail
+                "sub    r4,r1,4",     // use r4 to not need to restore r1
+                "cmp    r4,r0",       // Are we of size 4?
+                "orrne  r2,1",        // If not, set islarge flag
+                "str    r2,[r0]",     // Store pointer + islarge flag
+                "strne  r1,[r0,4]",   // Store Last
+                "b      9f",
+            "6:", // fmError
+                "b      9f",          // maybe this should panic instead of just exiting?
+            
+            "7:", // fmMergeTail
+                "ldr    r3,[r2]",     // Grab next block's next ptr
+                "tst    r3,1",        // Do the usual dance to get Last
+                "orr    r3,1",        // The new islarge will surely be set
+                "add    r1,r2,4",
+                "ldrne  r1,[r1]",
+                "str    r3,[r0]",     // Expand this block by using the next
+                "str    r1,[r0,4]",   // block's Next and Last pointers
+            "9:",
+                in("r0") ptr,
+                in("r1") layout.size(),
+                inout("r5") &self.free_list as *const *mut u8 => _, // pointer to pointer
+                in("r12") self.heap_end,
+                out("r4") _,
+                clobber_abi("C"),
+                options(raw),
+            );
+        });
     }
 }
 
