@@ -15,7 +15,7 @@
     .arm
     .align 2
 
-    .section .itcm.__aeabi_memmove, "ax", %progbits
+    .section .iwram.__aeabi_memmove, "ax", %progbits
     .global __aeabi_memmove
 __aeabi_memmove:
     cmp     r0, r1
@@ -42,7 +42,7 @@ __agbabi_memmove1:
     .extern __agbabi_memcpy1
     b       __agbabi_memcpy1
 
-    .section .itcm.memmove, "ax", %progbits
+    .section .iwram.memmove, "ax", %progbits
     .global memmove
 memmove:
     push    {r0, lr}

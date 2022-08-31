@@ -8,7 +8,6 @@ Includes implementations for various [aeabi functions](https://github.com/ARM-so
 
 Only the parts relevant to the DS are used. More may be pulled in in the future.  
 Following changes were needed:  
-- Moved from IWRAM to ITCM
 - Converted from divided to unified syntax to support Rust's inline assembly system
 - Local labels changed to numbered labels (otherwise we end up with duplicates, since rust doesn't support local labels properly)
 

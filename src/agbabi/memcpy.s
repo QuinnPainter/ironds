@@ -17,7 +17,7 @@
     .arm
     .align 2
 
-    .section .itcm.__aeabi_memcpy, "ax", %progbits
+    .section .iwram.__aeabi_memcpy, "ax", %progbits
     .global __aeabi_memcpy
 __aeabi_memcpy:
     // >6-bytes is roughly the threshold when byte-by-byte copy is slower
@@ -113,7 +113,7 @@ __agbabi_memcpy1:
     bgt     __agbabi_memcpy1
     bx      lr
 
-    .section .itcm.memcpy, "ax", %progbits
+    .section .iwram.memcpy, "ax", %progbits
     .global memcpy
 memcpy:
     push    {r0, lr}

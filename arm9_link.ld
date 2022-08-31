@@ -73,6 +73,7 @@ SECTIONS {
         __itcm_lma = LOADADDR(.itcm);
         __itcm_start = ABSOLUTE(.); /* VMA */
         *(.itcm*);
+        *(.iwram*); /* put iwram stuff in ITCM, so code can be the same between ARM9/ARM7 */
         . = ALIGN(4);
         __itcm_end = ABSOLUTE(.);
     } > itcm AT> ewram : itcm = 0xff

@@ -18,7 +18,7 @@
     .arm
     .align 2
 
-    .section .itcm.__aeabi_memclr, "ax", %progbits
+    .section .iwram.__aeabi_memclr, "ax", %progbits
     .global __aeabi_memclr
 __aeabi_memclr:
     mov     r2, #0
@@ -31,7 +31,7 @@ __aeabi_memclr4:
     mov     r2, #0
     b       __agbabi_wordset4
 
-    .section .itcm.__aeabi_memset, "ax", %progbits
+    .section .iwram.__aeabi_memset, "ax", %progbits
     .global __aeabi_memset
 __aeabi_memset:
     mov     r2, r2, lsl #24
@@ -95,7 +95,7 @@ __agbabi_lwordset4:
     strbmi  r2, [r0]
     bx      lr
 
-    .section .itcm.memset, "ax", %progbits
+    .section .iwram.memset, "ax", %progbits
     .global memset
 memset:
     mov     r3, r1

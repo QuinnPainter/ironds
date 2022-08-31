@@ -4,7 +4,9 @@
 #![feature(alloc_error_handler)]
 
 #[cfg(all(feature = "arm9", feature = "arm7"))]
-compile_error!("feature \"arm9\" and feature \"arm7\" cannot be enabled at the same time");
+compile_error!("Feature \"arm9\" and feature \"arm7\" cannot be enabled at the same time");
+#[cfg(not(any(feature = "arm9", feature = "arm7")))]
+compile_error!("Either feature \"arm9\" or \"arm7\" must be enabled");
 
 extern crate alloc;
 use alloc::string::String;
@@ -56,7 +58,7 @@ extern "C" fn lib_init() {
 #[panic_handler]
 fn panic(info: &core::panic::PanicInfo) -> ! {
     // concat! doesn't like const strings, this works as a workaround
-    macro_rules! ERR_HEADER { () => { "        ---- PANIC! ----\n\n" }; }
+    macro_rules! ERR_HEADER { () => { "      ---- ARM9 PANIC ----\n\n" }; }
 
     interrupt::disable_interrupts_master!();
     let mut output: String = String::new();

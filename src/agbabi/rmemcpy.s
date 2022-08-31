@@ -13,7 +13,7 @@
     .arm
     .align 2
 
-    .section .itcm.__agbabi_rmemcpy, "ax", %progbits
+    .section .iwram.__agbabi_rmemcpy, "ax", %progbits
     .global __agbabi_rmemcpy
 __agbabi_rmemcpy:
     // >6-bytes is roughly the threshold when byte-by-byte copy is slower
