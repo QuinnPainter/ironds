@@ -17,14 +17,16 @@ pub fn print (s: &str) {
                 "mov r4, #0",     // insert 0 terminator at end of string
                 "strb r4, [r3]",  //
                 "ldr r3, =__aeabi_memcpy", // copy the input string into the .space below
-                "blx r3",
+                "bl 3f", // jumps to "bx r3"
                 "mov r12, r12",
-                "b 3f", // f = local label is forwards (llvm bug prevents using labels 0 and 1?)
+                "b 4f", // f = local label is forwards (llvm bug prevents using labels 0 and 1?)
                 ".hword 0x6464", // magic number
                 ".hword 0", // flags?
                 "2:",
                 ".space 101", // extra byte for 0 terminator
                 "3:",
+                "bx r3", // separate bx since arm7 doesn't have blx
+                "4:",
                 ".align",
                 in("r1") chunk as *const [u8] as *const u8, // inline version of ".as_ptr()"
                 in("r2") chunk.len(),
