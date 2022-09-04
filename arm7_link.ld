@@ -13,6 +13,9 @@ __svc_stack = ORIGIN(iwram) + LENGTH(iwram);
 __irq_stack = __svc_stack - 0x100;
 __usr_stack = __irq_stack - 0x100;
 
+__irq_vec   = 0x0380FFFC;
+__irq_flags = 0x0380FFF8;
+
 /* https://sourceware.org/binutils/docs/ld/PHDRS.html */
 /* https://refspecs.linuxbase.org/elf/gabi4+/ch5.pheader.html#p_flags */
 /* 7 flag = read, write and execute */
