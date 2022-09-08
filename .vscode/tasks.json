@@ -1,0 +1,33 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build ARM9",
+            "type": "shell",
+            "command": "cargo build --release --features \"arm9\"",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate ARM9 ASM",
+            "type": "shell",
+            "command": "cargo rustc --release -- --cfg 'feature=\"arm9\"' --emit asm",
+            "group": {
+                "kind": "build",
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "cargo clean",
+            "group": "none",
+            "problemMatcher": []
+        }
+    ]
+}
