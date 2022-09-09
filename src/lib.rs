@@ -26,6 +26,7 @@ pub mod display;
 pub mod timers;
 pub mod addr;
 pub mod agbabi;
+pub mod syscall;
 
 // Accessing variables from the linkerscript is weird.
 // https://stackoverflow.com/questions/72820626/how-to-access-a-variable-from-linker-script-in-rust-code?noredirect=1&lq=1
@@ -41,18 +42,31 @@ fn heap_size() -> usize {
     unsafe { &__heap_size as *const _ as usize }
 }
 
+#[inline(always)]
+fn irq_vec() -> *mut usize {
+    extern "C" { static __irq_vec: *mut usize; }
+    unsafe { &__irq_vec as *const _ as *mut usize }
+}
+
+#[inline(always)]
+fn irq_flags() -> *mut u32 {
+    extern "C" { static __irq_flags: *mut u32; }
+    unsafe { &__irq_flags as *const _ as *mut u32 }
+}
+
 // this function is called from init.s, before main.
 // interrupts are disabled at this point, so no need to worry about thread-safety
 #[no_mangle]
 extern "C" fn lib_init() {
-    // turn on all graphics engines
     #[cfg(feature = "arm9")]
     {
+        // turn on all graphics engines
         display::power_on(display::GfxPwr::ALL);
         // set brightness to default level
         display::set_brightness(display::GfxEngine::MAIN, 0);
         display::set_brightness(display::GfxEngine::SUB, 0);
     }
+    unsafe { core::ptr::write(irq_vec(), interrupt::irq_handler as usize); }
     unsafe { ALLOCATOR.init(heap_start(), heap_size()); }
 }
 

@@ -25,3 +25,7 @@ pub macro critical_section($code:block) {
     // only re-enable interrupts if they were enabled before this
     if e { crate::interrupt::enable_interrupts_master!(); }
 }
+
+// Run whenever an IRQ is triggered. Should not be called by user code.
+#[instruction_set(arm::a32)]
+pub fn irq_handler() {}

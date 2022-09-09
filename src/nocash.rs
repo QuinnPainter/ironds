@@ -11,7 +11,6 @@ pub fn print (s: &str) {
     for chunk in s.as_bytes().chunks(100) {
         unsafe {
             asm!(
-                ".arm",
                 "ldr r0, =2f",
                 "add r3, r0, r2", //
                 "mov r4, #0",     // insert 0 terminator at end of string
