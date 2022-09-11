@@ -42,7 +42,7 @@ fn heap_size() -> usize {
     unsafe { &__heap_size as *const _ as usize }
 }
 
-#[inline(always)]
+/*#[inline(always)]
 fn irq_vec() -> *mut usize {
     extern "C" { static __irq_vec: *mut usize; }
     unsafe { &__irq_vec as *const _ as *mut usize }
@@ -52,7 +52,7 @@ fn irq_vec() -> *mut usize {
 fn irq_flags() -> *mut u32 {
     extern "C" { static __irq_flags: *mut u32; }
     unsafe { &__irq_flags as *const _ as *mut u32 }
-}
+}*/
 
 // this function is called from init.s, before main.
 // interrupts are disabled at this point, so no need to worry about thread-safety
@@ -66,7 +66,7 @@ extern "C" fn lib_init() {
         display::set_brightness(display::GfxEngine::MAIN, 0);
         display::set_brightness(display::GfxEngine::SUB, 0);
     }
-    unsafe { core::ptr::write(irq_vec(), interrupt::irq_handler as usize); }
+    //unsafe { core::ptr::write(irq_vec(), interrupt::irq_handler as usize); }
     unsafe { ALLOCATOR.init(heap_start(), heap_size()); }
 }
 

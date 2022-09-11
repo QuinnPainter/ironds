@@ -114,6 +114,11 @@ __start:
     ldr r2, =__dtcm_size
     bl __init_memcpy
 
+    /* Setup IRQ vector */
+    ldr r0, =__irq_vec
+    ldr r1, =irq_handler
+    str r1, [r0]
+
     ldr r0, =lib_init
     blx r0
 

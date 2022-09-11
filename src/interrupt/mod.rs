@@ -3,6 +3,7 @@
 // or could provide a custom impl for the critical-section crate:
 // https://github.com/embassy-rs/critical-section
 use core::ptr;
+use core::arch::global_asm;
 use crate::addr;
 
 // these are macros and not functions, so that they will be inlined for both ARM and THUMB
@@ -26,6 +27,7 @@ pub macro critical_section($code:block) {
     if e { crate::interrupt::enable_interrupts_master!(); }
 }
 
-// Run whenever an IRQ is triggered. Should not be called by user code.
-#[instruction_set(arm::a32)]
-pub fn irq_handler() {}
+global_asm! {
+    include_str!("irq_handler.s"),
+    options(raw)
+}
