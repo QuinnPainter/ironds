@@ -102,11 +102,3 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 fn alloc_error(layout: core::alloc::Layout) -> ! {
     panic!("memory allocation of {} bytes failed", layout.size())
 }
-
-// why are these needed??? rust shouldn't be calling C++ exception unwinding code
-// can be fixed by enabling lto, maybe? https://blog.bokuweb.me/entry/2020/04/14/101202
-#[no_mangle]
-pub fn __aeabi_unwind_cpp_pr0() {}
-
-#[no_mangle]
-pub fn __aeabi_unwind_cpp_pr1() {}
