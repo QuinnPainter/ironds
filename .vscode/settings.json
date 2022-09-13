@@ -3,5 +3,8 @@
     "rust-analyzer.cargo.target": "thumbv5te-none-eabi.json",
     "rust-analyzer.cargo.features": [
         "arm9"
-    ]
+    ],
+    "files.associations": {
+        "*.s": "arm"
+    }
 }
