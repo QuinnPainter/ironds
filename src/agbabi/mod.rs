@@ -1,3 +1,15 @@
+//! Module that provides `aeabi` functions.
+//! 
+//! These functions are provided by `compiler-builtins` by default, but these replacement versions are faster.  
+//! Generally, the `aeabi` functions shouldn't be called directly, you should use the proper Rust equivalent
+//! which will then call these functions under the hood.  
+//! For example, instead of `memcpy` you should use `core::ptr::copy_nonoverlapping`.
+//! 
+//! The `agbabi` functions may be called directly, and may be more suitable in particular situations.
+//! Don't use them unless you know what you're doing.
+//! Their documentation can be found [here](https://github.com/felixjones/agbabi).
+#![allow(missing_docs)]
+
 use core::arch::global_asm;
 
 global_asm! {
@@ -61,8 +73,10 @@ extern "C" {
 
 // why are these needed??? rust shouldn't be calling C++ exception unwinding code
 // can be fixed by enabling lto, maybe? https://blog.bokuweb.me/entry/2020/04/14/101202
+#[doc(hidden)]
 #[no_mangle]
 pub fn __aeabi_unwind_cpp_pr0() {}
 
+#[doc(hidden)]
 #[no_mangle]
 pub fn __aeabi_unwind_cpp_pr1() {}

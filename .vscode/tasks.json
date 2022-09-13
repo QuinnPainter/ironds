@@ -28,6 +28,13 @@
             "command": "cargo clean",
             "group": "none",
             "problemMatcher": []
-        }
+        },
+        {
+            "label": "Generate docs",
+            "type": "shell",
+            "command": "cargo doc --features \"arm9, arm7\"",
+            "group": "none",
+            "problemMatcher": []
+        },
     ]
 }

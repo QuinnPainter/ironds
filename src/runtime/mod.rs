@@ -1,3 +1,8 @@
+//! The startup runtime that runs before the `main` function.
+//! 
+//! Also known as "rt0". Does things like initialise variables, copy your stuff
+//! into ITCM / DTCM / IWRAM, and initialise hardware registers.
+
 use core::arch::global_asm;
 use core::panic;
 
@@ -14,11 +19,13 @@ global_asm! {
 }
 
 #[no_mangle]
+#[doc(hidden)]
 pub fn return_from_main() -> ! {
     panic!("returned from main");
 }
 
 // pad out the secure area so the cart isn't encrypted
+#[doc(hidden)]
 #[cfg(feature = "arm9")]
 #[link_section = ".secure"]
 #[no_mangle]

@@ -1,3 +1,5 @@
+//! Module for utilising the hardware timers.
+
 use core::ptr;
 use crate::addr;
 

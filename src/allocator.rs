@@ -19,7 +19,7 @@ use core::alloc::{GlobalAlloc, Layout};
 use core::ptr;
 use crate::interrupt::critical_section;
 
-pub struct ACSLAlloc {
+pub(crate) struct ACSLAlloc {
     free_list: *mut u8, // Pointer to the beginning of the free list. (can change)
     heap_end: *mut u8, // pointer to the end of the heap (never changes)
     heap_size: usize, // size of the heap in bytes (never changes)

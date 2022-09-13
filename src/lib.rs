@@ -2,8 +2,12 @@
 #![feature(decl_macro)]
 #![feature(isa_attribute)]
 #![feature(alloc_error_handler)]
+#![warn(missing_docs)]
 
-#[cfg(all(feature = "arm9", feature = "arm7"))]
+//! A crate that allows you to develop for the Nintendo DS.
+
+// Doc builds with both arm9 and arm7 enabled so docs for both CPUs get generated
+#[cfg(all(feature = "arm9", feature = "arm7", not(doc)))]
 compile_error!("Feature \"arm9\" and feature \"arm7\" cannot be enabled at the same time");
 #[cfg(not(any(feature = "arm9", feature = "arm7")))]
 compile_error!("Either feature \"arm9\" or \"arm7\" must be enabled");

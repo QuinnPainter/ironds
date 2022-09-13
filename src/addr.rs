@@ -1,3 +1,5 @@
+//! Module that provides the addressess of various hardware registers.
+
 // https://www.problemkaputt.de/gbatek.htm#dsmemorycontrolvram
 #[cfg(feature = "arm7")]
 pub const VRAMSTAT: usize = 0x04000240;

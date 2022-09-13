@@ -1,10 +1,14 @@
-/* See the "Debug Messages" section of the NO$GBA help for more detail. */
-/* (the website is outdated, view it in the actual app) */
+//! Module that allows special interactions with certain emulators.
+
+// See the "Debug Messages" section of the NO$GBA help for more detail.
+// (the website is outdated, view it in the actual app)
 use core::arch::asm;
 use core::ptr::write_volatile;
 use crate::addr;
 
-// Works in NO$GBA, melonDS and DeSmuME
+/// Prints a message to the emulator's debug window.
+/// 
+/// Works in NO$GBA, melonDS and DeSmuME.
 #[instruction_set(arm::a32)]
 #[inline(never)]
 pub fn print (s: &str) {
@@ -36,8 +40,10 @@ pub fn print (s: &str) {
     }
 }
 
-// Works in NO$GBA and (soon?) melonDS
-// you should probably use "print" instead, as it is more compatible. this is just included for posterity.
+/// Prints a message to the emulator's debug window.
+/// 
+/// Works in NO$GBA and (soon?) melonDS.
+/// You should probably use "print" instead, as it is more compatible. This is just included for posterity.
 pub fn print2 (s: &str) {
     for b in s.bytes() {
         // this reg is really 8 bit in no$gba, but melonds won't accept it unless it's treated as 32 bit
@@ -45,7 +51,10 @@ pub fn print2 (s: &str) {
     }
 }
 
-// Works in both ARM and THUMB mode
+/// A code breakpoint that will pause the emulator when it is executed.
+/// 
+/// Works in NO$GBA.
+// Works in both ARM and THUMB mode.
 pub macro breakpoint () {
     unsafe {
         asm!(

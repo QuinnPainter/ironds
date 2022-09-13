@@ -1,3 +1,5 @@
+//! Wrappers for the builtin BIOS functions.
+
 use core::arch::asm;
 
 #[inline(never)]
