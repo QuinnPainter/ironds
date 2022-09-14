@@ -1,3 +1,12 @@
+//! Module that provides a global allocator.
+//! 
+//! Implements memory allocation and deallocation so you can use `alloc` things,
+//! like [`Vec`](mod@alloc::vec) and [`String`](alloc::string).
+//! 
+//! NOTE: This technically doesn't actually implement the GlobalAlloc spec properly.  
+//! The alignment factor given in the Layout is ignored, and all allocations are 32-bit aligned.  
+//! I can't think of a reason something would need more than 32-bit alignment, so hopefully this is fine?
+
 // Based on the malloc implementation in ACSL: (copied as of 2022-08-27)
 // https://codeberg.org/pgimeno/ACSL/src/branch/master/stdlib/malloc_free.s
 // used under the ISC License:
@@ -9,10 +18,6 @@
 // FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
 // LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
 // ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-// NOTE: This technically doesn't actually implement the GlobalAlloc spec properly:
-// the alignment factor given in the Layout is ignored, and all allocations are 32-bit aligned.
-// can't think of a reason something would need more than 32-bit alignment, so hopefully this is fine?
 
 use core::arch::asm;
 use core::alloc::{GlobalAlloc, Layout};

@@ -1,4 +1,5 @@
 //! Module that provides the addressess of various hardware registers.
+#![allow(missing_docs)]
 
 // https://www.problemkaputt.de/gbatek.htm#dsmemorycontrolvram
 #[cfg(feature = "arm7")]

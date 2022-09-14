@@ -1,3 +1,7 @@
+//! Module that provides a simple way to draw text to the screen.
+//! 
+//! This module is very limited, and should only really be used for debug purposes.
+
 use crate::{display, addr};
 use core::mem::size_of;
 
@@ -9,6 +13,10 @@ const BYTES_PER_LINE: usize = TILES_PER_LINE * 2;
 static mut CURSOR_X: u8 = 0;
 static mut CURSOR_Y: u8 = 0;
 
+/// Initialises the text console.
+/// 
+/// You must run this function before attempting to `print`.  
+/// Uses the Sub graphics engine, and loads into VRAM block H.
 pub fn init_default() {
     // Make sure the 2D graphics engines are turned on
     display::power_on(display::GfxPwr::ALL_2D);
@@ -47,7 +55,8 @@ pub fn init_default() {
 
         // load font into sub-bg VRAM
         // vram doesn't support 8 bit loads, must load as 16 bit
-        core::ptr::copy_nonoverlapping(DEFAULT_FONT.as_ptr() as *const u16, 0x06200000 as *mut u16, DEFAULT_FONT.len() / 2);
+        core::ptr::copy_nonoverlapping(DEFAULT_FONT.as_ptr() as *const u16,
+            0x06200000 as *mut u16, DEFAULT_FONT.len() / 2);
 
         // load palette into sub-bg palette RAM
         core::ptr::copy_nonoverlapping(DEFAULT_PALETTE.as_ptr(),
@@ -55,6 +64,10 @@ pub fn init_default() {
     }
 }
 
+/// Prints some text to the screen.
+/// 
+/// When text reaches the right edge of the screen, it will wrap around to the left side and move to the next line.  
+/// Make sure you have initialised the console before running this function.
 pub fn print(txt: &str) {
     for mut b in txt.bytes() {
         if b == '\n' as u8 {
@@ -80,12 +93,14 @@ pub fn print(txt: &str) {
     }
 }
 
+/// Returns the current position of the text cursor. (0, 0) is the top left.
 #[must_use]
 #[inline(always)]
 pub fn get_cursor_pos() -> (u8, u8) {
     unsafe { (CURSOR_X, CURSOR_Y) }
 }
 
+/// Sets the current position of the text cursor. (0, 0) is the top left.
 #[inline(always)]
 pub fn set_cursor_pos(x: u8, y: u8) {
     unsafe { CURSOR_X = x & 31; CURSOR_Y = y & 31; }

@@ -100,34 +100,35 @@ pub enum GfxEngine {
     SUB = 0x1000,
 }
 
-// Converts a standard hexcode (0xRRGGBB) to the 15-bit palette colour format
+/// Converts a standard hexcode (0xRRGGBB) to the 15-bit palette colour format.
 #[inline(always)]
 pub const fn rgb15(x: u32) -> u16 {
     (((x & 0xF80000) >> 19) | ((x & 0x00F800) >> 6) | ((x & 0x0000F8) << 7)) as u16
 }
 
-// Turns the specified graphics engines on (using POWCNT1)
+/// Turns the specified graphics engines on (using POWCNT1).
 #[cfg(feature = "arm9")]
 pub fn power_on(pwrflags: GfxPwr) {
     POWCNT1.write(POWCNT1.read() | pwrflags.bits);
 }
 
-// Turns the specified graphics engines off (using POWCNT1)
+/// Turns the specified graphics engines off (using POWCNT1).
 #[cfg(feature = "arm9")]
 pub fn power_off(pwrflags: GfxPwr) {
     POWCNT1.write(POWCNT1.read() & !pwrflags.bits);
 }
 
-// Sets which graphics engine corresponds with which display (top or bottom)
+/// Sets which graphics engine corresponds with which display (top or bottom).
 #[cfg(feature = "arm9")]
 pub fn set_engine_lcd(pos: MainEnginePos) {
     POWCNT1.write((POWCNT1.read() & !(MainEnginePos::TOP as u32)) | pos as u32);
 }
 
-// Set the master brightness for one of the graphics engines.
-// Brightness value can be from -16 to 16 (0 is default)
-// This doesn't set the backlight brightness, only applies a "colour correction"
-// -16 is pure black, 16 is pure white
+/// Sets the master brightness for one of the graphics engines.
+/// 
+/// Brightness value can be from -16 to 16 (0 is default)  
+/// This doesn't set the backlight brightness, only applies a "colour correction"  
+/// -16 is pure black, 16 is pure white
 #[cfg(feature = "arm9")]
 pub fn set_brightness(engine: GfxEngine, mut brightness: i32) {
     let master_bright = (addr::MASTER_BRIGHT_MAIN | engine as usize) as *mut u32;
@@ -147,6 +148,7 @@ pub fn set_main_display_control(c: DisplayControlMain) {
     unsafe { write_volatile(addr::DISPCNT_MAIN as *mut u32, u32::from(c)); }
 }
 
+#[must_use]
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn get_main_display_control() -> DisplayControlMain {
@@ -159,6 +161,7 @@ pub fn set_sub_display_control(c: DisplayControlSub) {
     unsafe { write_volatile(addr::DISPCNT_SUB as *mut u32, u32::from(c)); }
 }
 
+#[must_use]
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn get_sub_display_control() -> DisplayControlSub {
@@ -171,6 +174,7 @@ pub fn set_main_bg_control(bg: usize, c: BackgroundControl) {
     unsafe { write_volatile((addr::BG0CNT_MAIN + ((bg & 0x3) * 2)) as *mut u16, u16::from(c)); }
 }
 
+#[must_use]
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn get_main_bg_control(bg: usize) -> BackgroundControl {
@@ -183,6 +187,7 @@ pub fn set_sub_bg_control(bg: usize, c: BackgroundControl) {
     unsafe { write_volatile((addr::BG0CNT_SUB + ((bg & 0x3) * 2)) as *mut u16, u16::from(c)); }
 }
 
+#[must_use]
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn get_sub_bg_control(bg: usize) -> BackgroundControl {

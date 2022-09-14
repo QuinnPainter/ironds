@@ -1,3 +1,5 @@
+//! Module that provides access to the hardware interrupts.
+
 // todo: could enable atomics using a critical section, like in:
 // https://github.com/embassy-rs/atomic-polyfill
 // or could provide a custom impl for the critical-section crate:
@@ -7,31 +9,54 @@ use core::arch::global_asm;
 use bitflags::bitflags;
 use crate::addr;
 
-// these are macros and not functions, so that they will be inlined for both ARM and THUMB
-pub macro enable_interrupts_master() {
+global_asm! {
+    include_str!("irq_handler.s"),
+    options(raw)
+}
+
+/// Enables the Interrupt Master Enable, allowing interrupts to run.
+#[inline(always)]
+pub fn enable_ime() {
     unsafe { write_volatile(addr::IME as *mut u32, 1); }
 }
 
-pub macro disable_interrupts_master() {
+/// Disables the Interrupt Master Enable, preventing all interrupts from running.
+#[inline(always)]
+pub fn disable_ime() {
     unsafe { write_volatile(addr::IME as *mut u32, 0); }
 }
 
-pub macro is_ime_enabled() {
-    unsafe { ((read_volatile(addr::IME as *mut u32) & 1) == 1) }
+/// Checks if the Interrupt Master Enable is currently enabled.
+/// 
+/// Returns `false` if interrupts are disabled, `true` if they are enabled.
+#[inline(always)]
+pub fn read_ime() -> bool {
+    unsafe { (read_volatile(addr::IME as *mut u32) & 1) == 1 }
 }
 
+/// Prevents interrupts from occuring during a certain block of code.
+/// 
+/// Use this if you have some timing critical code, or if you need to manipulate some static data
+/// and need it to be thread-safe.
+/// # Examples
+/// 
+/// ```
+/// critical_section!({
+///     // important code here
+/// });
+/// ```
 pub macro critical_section($code:block) {
-    let e = crate::interrupt::is_ime_enabled!();
-    crate::interrupt::disable_interrupts_master!();
+    let e = crate::interrupt::read_ime();
+    crate::interrupt::disable_ime();
     { $code }
     // only re-enable interrupts if they were enabled before this
-    if e { crate::interrupt::enable_interrupts_master!(); }
+    if e { crate::interrupt::enable_ime(); }
 }
 
 #[no_mangle]
 #[cfg_attr(feature = "arm9", link_section = ".itcm.irq_table")]
 #[cfg_attr(feature = "arm7", link_section = ".iwram.irq_table")]
-static mut IRQ_TABLE: [usize; 25] = [0; 25];
+static mut USER_IRQ_HANDLER: Option<extern "C" fn(IRQFlags)> = None;
 
 pub enum IRQType {
     Vblank = 0,
@@ -90,21 +115,8 @@ bitflags! {
     }
 }
 
-global_asm! {
-    include_str!("irq_handler.s"),
-    options(raw)
-}
-
-pub fn irq_set_fn(t: IRQType, f: fn()) {
-    critical_section!({
-        unsafe { IRQ_TABLE[t as usize] = f as usize; }
-    });
-}
-
-pub fn irq_unset_fn(t: IRQType) {
-    critical_section!({
-        unsafe { IRQ_TABLE[t as usize] = 0; }
-    });
+pub fn irq_set_handler(f: Option<extern "C" fn(IRQFlags)>) {
+    unsafe { USER_IRQ_HANDLER = f; }
 }
 
 pub fn irq_enable(flags: IRQFlags) {

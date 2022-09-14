@@ -1,10 +1,10 @@
+//! A crate that allows you to develop for the Nintendo DS.
+
 #![no_std]
 #![feature(decl_macro)]
 #![feature(isa_attribute)]
 #![feature(alloc_error_handler)]
-#![warn(missing_docs)]
-
-//! A crate that allows you to develop for the Nintendo DS.
+//#![warn(missing_docs)]
 
 // Doc builds with both arm9 and arm7 enabled so docs for both CPUs get generated
 #[cfg(all(feature = "arm9", feature = "arm7", not(doc)))]
@@ -72,6 +72,7 @@ extern "C" fn lib_init() {
     }
     //unsafe { core::ptr::write(irq_vec(), interrupt::irq_handler as usize); }
     unsafe { ALLOCATOR.init(heap_start(), heap_size()); }
+    // todo: make sure IRQ stuff is inited and pointing to nothing, and enable IME
 }
 
 #[panic_handler]
@@ -79,7 +80,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     // concat! doesn't like const strings, this works as a workaround
     macro_rules! ERR_HEADER { () => { "      ---- ARM9 PANIC ----\n\n" }; }
 
-    interrupt::disable_interrupts_master!();
+    interrupt::disable_ime();
     let mut output: String = String::new();
     let printed_output: &str;
     // Reserve enough chars to fill the screen
