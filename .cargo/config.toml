@@ -1,5 +1,5 @@
 [build]
-target = "thumbv5te-none-eabi.json"
+target = "thumbv5te-none-eabi"
 [unstable]
 build-std = ["core", "alloc"]
 [target.thumbv5te-none-eabi]
