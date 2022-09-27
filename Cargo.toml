@@ -15,3 +15,6 @@ modular-bitfield = { version = "0.11" }
 [features]
 arm9 = []
 arm7 = []
+
+[profile.dev]
+opt-level = 3

@@ -46,16 +46,16 @@ pub fn read_ime() -> bool {
 /// });
 /// ```
 pub macro critical_section($code:block) {
-    let e = crate::interrupt::read_ime();
-    crate::interrupt::disable_ime();
+    let e = read_ime();
+    disable_ime();
     { $code }
     // only re-enable interrupts if they were enabled before this
-    if e { crate::interrupt::enable_ime(); }
+    if e { enable_ime(); }
 }
 
 #[no_mangle]
-#[cfg_attr(feature = "arm9", link_section = ".itcm.irq_table")]
-#[cfg_attr(feature = "arm7", link_section = ".iwram.irq_table")]
+#[cfg_attr(feature = "arm9", link_section = ".itcm.irq_handler_ptr")]
+#[cfg_attr(feature = "arm7", link_section = ".iwram.irq_handler_ptr")]
 static mut USER_IRQ_HANDLER: Option<extern "C" fn(IRQFlags)> = None;
 
 pub enum IRQType {
@@ -115,6 +115,7 @@ bitflags! {
     }
 }
 
+#[inline(always)]
 pub fn irq_set_handler(f: Option<extern "C" fn(IRQFlags)>) {
     unsafe { USER_IRQ_HANDLER = f; }
 }

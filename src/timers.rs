@@ -25,7 +25,7 @@ const TIMER_START: u16 = 0x80;
 /// Uses 2 cascading hardware timers for a 32 bit resolution.
 /// The input is the index of the first timer (0-2).
 pub fn start_profiler_timer(timer_index: u32) {
-    assert!(timer_index <= 2, "invalid timer index for start_profiler_timer (must be 0 to 2)");
+    debug_assert!(timer_index <= 2, "invalid timer index for start_profiler_timer (must be 0 to 2)");
     let first_timer_addr = BASE_TIMER_ADDR + (timer_index * 4) as usize;
     unsafe {
         // stop both timers, and set reload value to 0
@@ -42,7 +42,7 @@ pub fn start_profiler_timer(timer_index: u32) {
 /// 
 /// Make sure to pass in the same timer index used for [`start_profiler_timer`].
 pub fn end_profiler_timer(timer_index: u32) -> u32 {
-    assert!(timer_index <= 2, "invalid timer index for end_profiler_timer (must be 0 to 2)");
+    debug_assert!(timer_index <= 2, "invalid timer index for end_profiler_timer (must be 0 to 2)");
     let first_timer_addr = BASE_TIMER_ADDR + (timer_index * 4) as usize;
     unsafe {
         let low: u16 = ptr::read_volatile((first_timer_addr + 0) as *mut u16);

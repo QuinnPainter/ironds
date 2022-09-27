@@ -6,7 +6,7 @@
         {
             "label": "Build ARM9",
             "type": "shell",
-            "command": "cargo build --release --features \"arm9\"",
+            "command": "cargo build --features \"arm9\"",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -16,7 +16,7 @@
         {
             "label": "Generate ARM9 ASM",
             "type": "shell",
-            "command": "cargo rustc --release -- --cfg 'feature=\"arm9\"' --emit asm",
+            "command": "cargo rustc -- --cfg 'feature=\"arm9\"' --emit asm",
             "group": {
                 "kind": "build",
             },
