@@ -3,7 +3,6 @@
 // See the "Debug Messages" section of the NO$GBA help for more detail.
 // (the website is outdated, view it in the actual app)
 use core::arch::asm;
-use core::ptr::write_volatile;
 use crate::addr;
 
 /// Prints a message to the emulator's debug window.
@@ -46,8 +45,7 @@ pub fn print (s: &str) {
 /// You should probably use "print" instead, as it is more compatible. This is just included for posterity.
 pub fn print2 (s: &str) {
     for b in s.bytes() {
-        // this reg is really 8 bit in no$gba, but melonds won't accept it unless it's treated as 32 bit
-        unsafe { write_volatile(addr::NOCASH_CHAROUT as *mut u32, b as u32); }
+        addr::NOCASH_CHAROUT.write(b as u32);
     }
 }
 

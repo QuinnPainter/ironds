@@ -6,7 +6,7 @@
         {
             "label": "Build ARM9",
             "type": "shell",
-            "command": "cargo build --features \"arm9\"",
+            "command": "cargo build --features 'arm9'",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -16,6 +16,7 @@
         {
             "label": "Generate ARM9 ASM",
             "type": "shell",
+            // can't figure out a way to get these quotes to escape properly in Powershell. works fine in bash
             "command": "cargo rustc -- --cfg 'feature=\"arm9\"' --emit asm",
             "group": {
                 "kind": "build",
@@ -32,7 +33,7 @@
         {
             "label": "Generate docs",
             "type": "shell",
-            "command": "cargo doc --features \"arm9, arm7\"",
+            "command": "cargo doc --features 'arm9, arm7'",
             "group": "none",
             "problemMatcher": []
         },

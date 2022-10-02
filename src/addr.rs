@@ -1,27 +1,40 @@
 //! Module that provides the addressess of various hardware registers.
-#![allow(missing_docs)]
+#![allow(missing_docs)] // can remove this when all are voladdresses
+
+use voladdress::{VolAddress, VolBlock, Safe};
+
+// thanks rust-console/gba, this is a good idea!
+// todo: does this little snippet justify a license dependency??
+macro_rules! def_mmio {
+    ($addr:literal = $name:ident : $t:ty; [ $($cpu:expr),+ ] $(; $comment:expr )?) => {
+        // redirect a call **without** an alias list to just pass an empty alias list
+        def_mmio!($addr = $name/[]: $t; [$($cpu),+] $(; $comment)? );
+    };
+    ($addr:literal = $name:ident / [ $( $alias:literal ),* ]: $t:ty ; [ $($cpu:expr),+ ] $(; $comment:expr )?) => {
+        $(#[doc = $comment])?
+        // this could be formatted better, like:
+        // "Accessible to arm9 and arm7"
+        // or "Accessible to arm9 only"
+        // but can't figure out a good way to do so
+        #[doc = concat!("\n", $("\nAccessible to ", $cpu, "  "),+)]
+        $(#[doc(alias = $alias)])*
+        #[allow(missing_docs)]
+        #[cfg(any($(feature = $cpu),*))]
+        pub const $name: $t = unsafe { <$t>::new($addr) };
+    };
+}
 
 // https://www.problemkaputt.de/gbatek.htm#dsmemorycontrolvram
-#[cfg(feature = "arm7")]
-pub const VRAMSTAT: usize = 0x04000240;
-#[cfg(feature = "arm9")]
-pub const VRAMCNT_A: usize = 0x04000240;
-#[cfg(feature = "arm9")]
-pub const VRAMCNT_B: usize = 0x04000241;
-#[cfg(feature = "arm9")]
-pub const VRAMCNT_C: usize = 0x04000242;
-#[cfg(feature = "arm9")]
-pub const VRAMCNT_D: usize = 0x04000243;
-#[cfg(feature = "arm9")]
-pub const VRAMCNT_E: usize = 0x04000244;
-#[cfg(feature = "arm9")]
-pub const VRAMCNT_F: usize = 0x04000245;
-#[cfg(feature = "arm9")]
-pub const VRAMCNT_G: usize = 0x04000246;
-#[cfg(feature = "arm9")]
-pub const VRAMCNT_H: usize = 0x04000248;
-#[cfg(feature = "arm9")]
-pub const VRAMCNT_I: usize = 0x04000249;
+def_mmio!(0x0400_0240 = VRAMSTAT: VolAddress<u8, Safe, ()>; ["arm7"]; "VRAM Bank Status");
+def_mmio!(0x0400_0240 = VRAMCNT_A: VolAddress<u8, (), Safe>; ["arm9"]; "VRAM-A Bank Control");
+def_mmio!(0x0400_0241 = VRAMCNT_B: VolAddress<u8, (), Safe>; ["arm9"]; "VRAM-B Bank Control");
+def_mmio!(0x0400_0242 = VRAMCNT_C: VolAddress<u8, (), Safe>; ["arm9"]; "VRAM-C Bank Control");
+def_mmio!(0x0400_0243 = VRAMCNT_D: VolAddress<u8, (), Safe>; ["arm9"]; "VRAM-D Bank Control");
+def_mmio!(0x0400_0244 = VRAMCNT_E: VolAddress<u8, (), Safe>; ["arm9"]; "VRAM-E Bank Control");
+def_mmio!(0x0400_0245 = VRAMCNT_F: VolAddress<u8, (), Safe>; ["arm9"]; "VRAM-F Bank Control");
+def_mmio!(0x0400_0246 = VRAMCNT_G: VolAddress<u8, (), Safe>; ["arm9"]; "VRAM-G Bank Control");
+def_mmio!(0x0400_0248 = VRAMCNT_H: VolAddress<u8, (), Safe>; ["arm9"]; "VRAM-H Bank Control");
+def_mmio!(0x0400_0249 = VRAMCNT_I: VolAddress<u8, (), Safe>; ["arm9"]; "VRAM-I Bank Control");
 
 // https://www.problemkaputt.de/gbatek.htm#dsvideostuff
 #[cfg(feature = "arm9")]
@@ -82,8 +95,8 @@ pub const BG3YOFS_MAIN: usize = 0x0400001E;
 #[cfg(feature = "arm9")]
 pub const BG3YOFS_SUB: usize = 0x0400101E;
 
-pub const DISPSTAT: usize = 0x04000004;
-pub const VCOUNT: usize = 0x04000006;
+def_mmio!(0x0400_0004 = DISPSTAT: VolAddress<u16, Safe, Safe>; ["arm9", "arm7"]; "Display Status");
+def_mmio!(0x0400_0006 = VCOUNT: VolAddress<u16, Safe, ()>; ["arm9", "arm7"]; "Vertical Counter");
 
 // https://www.problemkaputt.de/gbatek.htm#dsvideocaptureandmainmemorydisplaymode
 #[cfg(feature = "arm9")]
@@ -183,9 +196,10 @@ pub const HALTCNT: usize = 0x04000301;
 pub const POSTFLG: usize = 0x04000300;
 
 // https://www.problemkaputt.de/gbatek.htm#dsdebugregistersemulatordevkits
-pub const NOCASH_EMUID: usize = 0x04FFFA00;
-pub const NOCASH_STROUT_RAW: usize = 0x04FFFA10;
-pub const NOCASH_STROUT_PARAM: usize = 0x04FFFA14;
-pub const NOCASH_STROUT_PARAM_LF: usize = 0x04FFFA18;
-pub const NOCASH_CHAROUT: usize = 0x04FFFA1C;
-pub const NOCASH_CLOCKS: usize = 0x04FFFA20;
+def_mmio!(0x04FF_FA00 = NOCASH_EMUID: VolBlock<u8, Safe, (), 16>; ["arm9", "arm7"]; "Nocash Emulator ID");
+def_mmio!(0x04FF_FA10 = NOCASH_STROUT_RAW: VolAddress<u32, (), Safe>; ["arm9", "arm7"]; "Nocash String Out (raw)");
+def_mmio!(0x04FF_FA14 = NOCASH_STROUT_PARAM: VolAddress<u32, (), Safe>; ["arm9", "arm7"]; "Nocash String Out (with %params)");
+def_mmio!(0x04FF_FA18 = NOCASH_STROUT_PARAM_LF: VolAddress<u32, (), Safe>; ["arm9", "arm7"]; "Nocash String Out (with %params and linefeed)");
+// this reg is really 8 bit in no$gba, but melonds won't accept it unless it's treated as 32 bit
+def_mmio!(0x04FF_FA1C = NOCASH_CHAROUT: VolAddress<u32, (), Safe>; ["arm9", "arm7"]; "Nocash Character Out");
+def_mmio!(0x04FF_FA20 = NOCASH_CLOCKS: VolBlock<u32, Safe, (), 2>; ["arm9", "arm7"]; "Nocash Clock Cycles");

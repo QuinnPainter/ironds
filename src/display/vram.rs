@@ -1,4 +1,3 @@
-use core::ptr::write_volatile;
 use crate::addr;
 
 // https://www.problemkaputt.de/gbatek.htm#dsmemorycontrolvram
@@ -134,56 +133,57 @@ pub mod vram_type {
 }
 
 // todo: deduplicate these functions somehow. proc macro?
+// are they really necessary? could just expose voladdresses of type vram_type::t
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_a(vtype: vram_type::A) {
-    unsafe { write_volatile(addr::VRAMCNT_A as *mut u8, vtype as u8); }
+    addr::VRAMCNT_A.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_b(vtype: vram_type::B) {
-    unsafe { write_volatile(addr::VRAMCNT_B as *mut u8, vtype as u8); }
+    addr::VRAMCNT_B.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_c(vtype: vram_type::C) {
-    unsafe { write_volatile(addr::VRAMCNT_C as *mut u8, vtype as u8); }
+    addr::VRAMCNT_C.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_d(vtype: vram_type::D) {
-    unsafe { write_volatile(addr::VRAMCNT_D as *mut u8, vtype as u8); }
+    addr::VRAMCNT_D.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_e(vtype: vram_type::E) {
-    unsafe { write_volatile(addr::VRAMCNT_E as *mut u8, vtype as u8); }
+    addr::VRAMCNT_E.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_f(vtype: vram_type::F) {
-    unsafe { write_volatile(addr::VRAMCNT_F as *mut u8, vtype as u8); }
+    addr::VRAMCNT_F.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_g(vtype: vram_type::G) {
-    unsafe { write_volatile(addr::VRAMCNT_G as *mut u8, vtype as u8); }
+    addr::VRAMCNT_G.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_h(vtype: vram_type::H) {
-    unsafe { write_volatile(addr::VRAMCNT_H as *mut u8, vtype as u8); }
+    addr::VRAMCNT_H.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_i(vtype: vram_type::I) {
-    unsafe { write_volatile(addr::VRAMCNT_I as *mut u8, vtype as u8); }
+    addr::VRAMCNT_I.write(vtype as u8);
 }
