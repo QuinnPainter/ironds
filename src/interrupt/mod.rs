@@ -7,7 +7,7 @@
 use core::ptr::{read_volatile, write_volatile};
 use core::arch::global_asm;
 use bitflags::bitflags;
-use crate::addr;
+use crate::mmio;
 
 global_asm! {
     include_str!("irq_handler.s"),
@@ -17,13 +17,13 @@ global_asm! {
 /// Enables the Interrupt Master Enable, allowing interrupts to run.
 #[inline(always)]
 pub fn enable_ime() {
-    unsafe { write_volatile(addr::IME as *mut u32, 1); }
+    unsafe { write_volatile(mmio::IME as *mut u32, 1); }
 }
 
 /// Disables the Interrupt Master Enable, preventing all interrupts from running.
 #[inline(always)]
 pub fn disable_ime() {
-    unsafe { write_volatile(addr::IME as *mut u32, 0); }
+    unsafe { write_volatile(mmio::IME as *mut u32, 0); }
 }
 
 /// Checks if the Interrupt Master Enable is currently enabled.
@@ -31,7 +31,7 @@ pub fn disable_ime() {
 /// Returns `false` if interrupts are disabled, `true` if they are enabled.
 #[inline(always)]
 pub fn read_ime() -> bool {
-    unsafe { (read_volatile(addr::IME as *mut u32) & 1) == 1 }
+    unsafe { (read_volatile(mmio::IME as *mut u32) & 1) == 1 }
 }
 
 /// Prevents interrupts from occuring during a certain block of code.
@@ -123,15 +123,15 @@ pub fn irq_set_handler(f: Option<extern "C" fn(IRQFlags)>) {
 
 pub fn irq_enable(flags: IRQFlags) {
     critical_section!({
-        unsafe { write_volatile(addr::IE as *mut u32, read_volatile(addr::IE as *mut u32) | flags.bits()); }
+        unsafe { write_volatile(mmio::IE as *mut u32, read_volatile(mmio::IE as *mut u32) | flags.bits()); }
         if flags & IRQFlags::VBLANK == IRQFlags::VBLANK {
-            addr::DISPSTAT.write(addr::DISPSTAT.read() | (1 << 3));
+            mmio::DISPSTAT.write(mmio::DISPSTAT.read() | (1 << 3));
         }
         if flags & IRQFlags::HBLANK == IRQFlags::HBLANK {
-            addr::DISPSTAT.write(addr::DISPSTAT.read() | (1 << 4));
+            mmio::DISPSTAT.write(mmio::DISPSTAT.read() | (1 << 4));
         }
         if flags & IRQFlags::VCOUNT == IRQFlags::VCOUNT {
-            addr::DISPSTAT.write(addr::DISPSTAT.read() | (1 << 5));
+            mmio::DISPSTAT.write(mmio::DISPSTAT.read() | (1 << 5));
         }
         // todo: also enable IPCSync
         // also make sure cpsr irq thing is enabled??
@@ -140,15 +140,15 @@ pub fn irq_enable(flags: IRQFlags) {
 
 pub fn irq_disable(flags: IRQFlags) {
     critical_section!({
-        unsafe { write_volatile(addr::IE as *mut u32, read_volatile(addr::IE as *mut u32) & !flags.bits()); }
+        unsafe { write_volatile(mmio::IE as *mut u32, read_volatile(mmio::IE as *mut u32) & !flags.bits()); }
         if flags & IRQFlags::VBLANK == IRQFlags::VBLANK {
-            addr::DISPSTAT.write(addr::DISPSTAT.read() & !(1 << 3));
+            mmio::DISPSTAT.write(mmio::DISPSTAT.read() & !(1 << 3));
         }
         if flags & IRQFlags::HBLANK == IRQFlags::HBLANK {
-            addr::DISPSTAT.write(addr::DISPSTAT.read() & !(1 << 4));
+            mmio::DISPSTAT.write(mmio::DISPSTAT.read() & !(1 << 4));
         }
         if flags & IRQFlags::VCOUNT == IRQFlags::VCOUNT {
-            addr::DISPSTAT.write(addr::DISPSTAT.read() & !(1 << 5));
+            mmio::DISPSTAT.write(mmio::DISPSTAT.read() & !(1 << 5));
         }
         // todo: also disable IPCSync
     });

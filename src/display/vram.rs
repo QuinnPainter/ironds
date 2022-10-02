@@ -1,4 +1,4 @@
-use crate::addr;
+use crate::mmio;
 
 // https://www.problemkaputt.de/gbatek.htm#dsmemorycontrolvram
 pub mod vram_type {
@@ -137,53 +137,53 @@ pub mod vram_type {
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_a(vtype: vram_type::A) {
-    addr::VRAMCNT_A.write(vtype as u8);
+    mmio::VRAMCNT_A.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_b(vtype: vram_type::B) {
-    addr::VRAMCNT_B.write(vtype as u8);
+    mmio::VRAMCNT_B.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_c(vtype: vram_type::C) {
-    addr::VRAMCNT_C.write(vtype as u8);
+    mmio::VRAMCNT_C.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_d(vtype: vram_type::D) {
-    addr::VRAMCNT_D.write(vtype as u8);
+    mmio::VRAMCNT_D.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_e(vtype: vram_type::E) {
-    addr::VRAMCNT_E.write(vtype as u8);
+    mmio::VRAMCNT_E.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_f(vtype: vram_type::F) {
-    addr::VRAMCNT_F.write(vtype as u8);
+    mmio::VRAMCNT_F.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_g(vtype: vram_type::G) {
-    addr::VRAMCNT_G.write(vtype as u8);
+    mmio::VRAMCNT_G.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_h(vtype: vram_type::H) {
-    addr::VRAMCNT_H.write(vtype as u8);
+    mmio::VRAMCNT_H.write(vtype as u8);
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn map_vram_block_i(vtype: vram_type::I) {
-    addr::VRAMCNT_I.write(vtype as u8);
+    mmio::VRAMCNT_I.write(vtype as u8);
 }

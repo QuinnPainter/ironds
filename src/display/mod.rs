@@ -6,10 +6,10 @@ use core::ptr::{read_volatile, write_volatile};
 use bitflags::bitflags;
 use modular_bitfield::prelude::*;
 use voladdress::*;
-use crate::addr;
+use crate::mmio;
 
 #[cfg(feature = "arm9")]
-const POWCNT1: VolAddress<u32, Safe, Safe> = unsafe { VolAddress::new(addr::POWCNT1) };
+const POWCNT1: VolAddress<u32, Safe, Safe> = unsafe { VolAddress::new(mmio::POWCNT1) };
 
 // Used with power_on and power_off
 bitflags! {
@@ -131,7 +131,7 @@ pub fn set_engine_lcd(pos: MainEnginePos) {
 /// -16 is pure black, 16 is pure white
 #[cfg(feature = "arm9")]
 pub fn set_brightness(engine: GfxEngine, mut brightness: i32) {
-    let master_bright = (addr::MASTER_BRIGHT_MAIN | engine as usize) as *mut u32;
+    let master_bright = (mmio::MASTER_BRIGHT_MAIN | engine as usize) as *mut u32;
     let mut mode: u32 = 1 << 14; // up
     if brightness < 0 {
         brightness = -brightness; // adjust to positive
@@ -145,51 +145,51 @@ pub fn set_brightness(engine: GfxEngine, mut brightness: i32) {
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn set_main_display_control(c: DisplayControlMain) {
-    unsafe { write_volatile(addr::DISPCNT_MAIN as *mut u32, u32::from(c)); }
+    unsafe { write_volatile(mmio::DISPCNT_MAIN as *mut u32, u32::from(c)); }
 }
 
 #[must_use]
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn get_main_display_control() -> DisplayControlMain {
-    unsafe { DisplayControlMain::from(read_volatile(addr::DISPCNT_MAIN as *mut u32)) }
+    unsafe { DisplayControlMain::from(read_volatile(mmio::DISPCNT_MAIN as *mut u32)) }
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn set_sub_display_control(c: DisplayControlSub) {
-    unsafe { write_volatile(addr::DISPCNT_SUB as *mut u32, u32::from(c)); }
+    unsafe { write_volatile(mmio::DISPCNT_SUB as *mut u32, u32::from(c)); }
 }
 
 #[must_use]
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn get_sub_display_control() -> DisplayControlSub {
-    unsafe { DisplayControlSub::from(read_volatile(addr::DISPCNT_SUB as *mut u32)) }
+    unsafe { DisplayControlSub::from(read_volatile(mmio::DISPCNT_SUB as *mut u32)) }
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn set_main_bg_control(bg: usize, c: BackgroundControl) {
-    unsafe { write_volatile((addr::BG0CNT_MAIN + ((bg & 0x3) * 2)) as *mut u16, u16::from(c)); }
+    unsafe { write_volatile((mmio::BG0CNT_MAIN + ((bg & 0x3) * 2)) as *mut u16, u16::from(c)); }
 }
 
 #[must_use]
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn get_main_bg_control(bg: usize) -> BackgroundControl {
-    unsafe { BackgroundControl::from(read_volatile((addr::BG0CNT_MAIN + ((bg & 0x3) * 2)) as *mut u16)) }
+    unsafe { BackgroundControl::from(read_volatile((mmio::BG0CNT_MAIN + ((bg & 0x3) * 2)) as *mut u16)) }
 }
 
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn set_sub_bg_control(bg: usize, c: BackgroundControl) {
-    unsafe { write_volatile((addr::BG0CNT_SUB + ((bg & 0x3) * 2)) as *mut u16, u16::from(c)); }
+    unsafe { write_volatile((mmio::BG0CNT_SUB + ((bg & 0x3) * 2)) as *mut u16, u16::from(c)); }
 }
 
 #[must_use]
 #[cfg(feature = "arm9")]
 #[inline(always)]
 pub fn get_sub_bg_control(bg: usize) -> BackgroundControl {
-    unsafe { BackgroundControl::from(read_volatile((addr::BG0CNT_SUB + ((bg & 0x3) * 2)) as *mut u16)) }
+    unsafe { BackgroundControl::from(read_volatile((mmio::BG0CNT_SUB + ((bg & 0x3) * 2)) as *mut u16)) }
 }

@@ -2,7 +2,7 @@
 //! 
 //! This module is very limited, and should only really be used for debug purposes.
 
-use crate::{display, addr};
+use crate::{display, mmio};
 use core::mem::size_of;
 
 static DEFAULT_FONT: &[u8; 4096] = include_bytes!("../../gfx/font.img.bin");
@@ -46,8 +46,8 @@ pub fn init_default() {
         .with_tilemap_base(4) // 8K offset
         .with_screen_size(0));
 
-    unsafe { core::ptr::write_volatile(addr::BG0XOFS_MAIN as *mut u16, 0); }
-    unsafe { core::ptr::write_volatile(addr::BG0YOFS_MAIN as *mut u16, 0); }
+    unsafe { core::ptr::write_volatile(mmio::BG0XOFS_MAIN as *mut u16, 0); }
+    unsafe { core::ptr::write_volatile(mmio::BG0YOFS_MAIN as *mut u16, 0); }
 
     unsafe {
         // fill tilemap with space characters

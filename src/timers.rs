@@ -2,12 +2,12 @@
 #![allow(dead_code)]
 
 use core::ptr;
-use crate::addr;
+use crate::mmio;
 
 // DS timers are the same as GBA, just incrementing at 33 MHz
 // https://problemkaputt.de/gbatek.htm#gbatimers
 
-const BASE_TIMER_ADDR: usize = addr::TM0CNT_L;
+const BASE_TIMER_ADDR: usize = mmio::TM0CNT_L;
 
 const PRESCALER_1: u16 = 0;
 const PRESCALER_64: u16 = 1;

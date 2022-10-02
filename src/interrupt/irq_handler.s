@@ -40,6 +40,7 @@ irq_handler:
 
     push {r2, lr} // save IRQ CPSR and System LR to System stack
 
+    // TODO: the AAPCS ABI technically says the stack should be 64 bit aligned here. maybe should do that?
     adr lr, 2f
     bx r0 // jump to user handler
 2:

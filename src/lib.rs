@@ -28,7 +28,7 @@ pub mod allocator;
 #[cfg(feature = "arm9")]
 pub mod display;
 pub mod timers;
-pub mod addr;
+pub mod mmio;
 pub mod agbabi;
 pub mod syscall;
 

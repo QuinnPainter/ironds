@@ -3,7 +3,7 @@
 // See the "Debug Messages" section of the NO$GBA help for more detail.
 // (the website is outdated, view it in the actual app)
 use core::arch::asm;
-use crate::addr;
+use crate::mmio;
 
 /// Prints a message to the emulator's debug window.
 /// 
@@ -45,7 +45,7 @@ pub fn print (s: &str) {
 /// You should probably use "print" instead, as it is more compatible. This is just included for posterity.
 pub fn print2 (s: &str) {
     for b in s.bytes() {
-        addr::NOCASH_CHAROUT.write(b as u32);
+        mmio::NOCASH_CHAROUT.write(b as u32);
     }
 }
 
