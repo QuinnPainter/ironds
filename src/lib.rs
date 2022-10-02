@@ -70,9 +70,11 @@ extern "C" fn lib_init() {
         display::set_brightness(display::GfxEngine::MAIN, 0);
         display::set_brightness(display::GfxEngine::SUB, 0);
     }
-    //unsafe { core::ptr::write(irq_vec(), interrupt::irq_handler as usize); }
     unsafe { ALLOCATOR.init(heap_start(), heap_size()); }
-    // todo: make sure IRQ stuff is inited and pointing to nothing, and enable IME
+
+    interrupt::irq_disable(interrupt::IRQFlags::all());
+    interrupt::irq_set_handler(None); // it should be None already, just making sure
+    interrupt::enable_ime();
 }
 
 #[panic_handler]

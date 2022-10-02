@@ -88,6 +88,7 @@ pub enum IRQType {
 }
 
 bitflags! {
+    #[repr(transparent)]
     pub struct IRQFlags: u32 {
         const VBLANK = 1 << IRQType::Vblank as u32;
         const HBLANK = 1 << IRQType::Hblank as u32;
@@ -123,7 +124,16 @@ pub fn irq_set_handler(f: Option<extern "C" fn(IRQFlags)>) {
 pub fn irq_enable(flags: IRQFlags) {
     critical_section!({
         unsafe { write_volatile(addr::IE as *mut u32, read_volatile(addr::IE as *mut u32) | flags.bits()); }
-        // todo: also enable interrupt sources (vblank etc)
+        if flags & IRQFlags::VBLANK == IRQFlags::VBLANK {
+            addr::DISPSTAT.write(addr::DISPSTAT.read() | (1 << 3));
+        }
+        if flags & IRQFlags::HBLANK == IRQFlags::HBLANK {
+            addr::DISPSTAT.write(addr::DISPSTAT.read() | (1 << 4));
+        }
+        if flags & IRQFlags::VCOUNT == IRQFlags::VCOUNT {
+            addr::DISPSTAT.write(addr::DISPSTAT.read() | (1 << 5));
+        }
+        // todo: also enable IPCSync
         // also make sure cpsr irq thing is enabled??
     });
 }
@@ -131,6 +141,15 @@ pub fn irq_enable(flags: IRQFlags) {
 pub fn irq_disable(flags: IRQFlags) {
     critical_section!({
         unsafe { write_volatile(addr::IE as *mut u32, read_volatile(addr::IE as *mut u32) & !flags.bits()); }
-        // todo: also disable interrupt sources (vblank etc)
+        if flags & IRQFlags::VBLANK == IRQFlags::VBLANK {
+            addr::DISPSTAT.write(addr::DISPSTAT.read() & !(1 << 3));
+        }
+        if flags & IRQFlags::HBLANK == IRQFlags::HBLANK {
+            addr::DISPSTAT.write(addr::DISPSTAT.read() & !(1 << 4));
+        }
+        if flags & IRQFlags::VCOUNT == IRQFlags::VCOUNT {
+            addr::DISPSTAT.write(addr::DISPSTAT.read() & !(1 << 5));
+        }
+        // todo: also disable IPCSync
     });
 }
