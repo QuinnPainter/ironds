@@ -15,34 +15,35 @@ irq_handler:
     // Acknowledge interrupts in IF
     ldr r1, [r12, #0x210] // r1 = IE
     ldr r0, [r12, #0x214] // r0 = IF
-    and r1, r1, r0     // r1 = IE & IF (all requested IRQs)
-    str r1, [r12, #0x214] // write (IE & IF) to IF = acknowledge all requested IRQs
+    and r0, r0, r1     // r0 = IE & IF (all requested IRQs)
+    str r0, [r12, #0x214] // write (IE & IF) to IF = acknowledge all requested IRQs
 
     // Acknowledge interrupts for the BIOS IRQ Flags
     ldr r2, =__irq_flags // r2 = BIOS IF Addr (defined in linkerscript)
-    ldr r0, [r2]        // r0 = BIOS IF
-    orr r0, r0, r1      // r0 |= (IE & IF)
-    str r0, [r2]        // write new BIOS IF
+    ldr r1, [r2]        // r1 = BIOS IF
+    orr r1, r1, r0      // r1 |= (IE & IF)
+    str r1, [r2]        // write new BIOS IF
 
-    ldr r0, =USER_IRQ_HANDLER
-    ldr r0, [r0] // load the actual function pointer into r0
-    cmp r0, #0   // is it 0 / None?
+    ldr r1, =USER_IRQ_HANDLER
+    ldr r1, [r1] // load the actual function pointer into r0
+    cmp r1, #0   // is it 0 / None?
     beq 3f       // branch if so
 
-    mrs r1, spsr
-    push {r1, r3, lr} // save SPSR_IRQ, OLD_IME and LR_IRQ (IRQ SPSR and LR needed for nested interrupts)
+    mrs r2, spsr
+    push {r2, r3, lr} // save SPSR_IRQ, OLD_IME and LR_IRQ (IRQ SPSR and LR needed for nested interrupts)
     
-    mrs r1, cpsr
-    mov r2, r1 // save IRQ CPSR in R2
-    bic r1, r1, #0xDF // Enable IRQs (and FIQ, because why not)
-    orr r1, r1, #0x1F // Switch to System mode
-    msr cpsr, r1
+    mrs r2, cpsr
+    mov r3, r2 // save IRQ CPSR in r3
+    bic r2, r2, #0xDF // Enable IRQs (and FIQ, because why not)
+    orr r2, r2, #0x1F // Switch to System mode
+    msr cpsr, r2
 
-    push {r2, lr} // save IRQ CPSR and System LR to System stack
+    push {r3, lr} // save IRQ CPSR and System LR to System stack
 
     // TODO: the AAPCS ABI technically says the stack should be 64 bit aligned here. maybe should do that?
+    // r0 = (IE & IF), passed into the user function
     adr lr, 2f
-    bx r0 // jump to user handler
+    bx r1 // jump to user handler
 2:
     // Disable IME while we mess with stuff
     mov r12, #0x4000000
