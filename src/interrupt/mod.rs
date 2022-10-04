@@ -124,6 +124,9 @@ pub fn irq_set_handler(f: Option<extern "C" fn(IRQFlags)>) {
 pub fn irq_enable(flags: IRQFlags) {
     critical_section!({
         unsafe { write_volatile(mmio::IE as *mut u32, read_volatile(mmio::IE as *mut u32) | flags.bits()); }
+        // todo: are these dispstat flags shared between ARM9/ARM7?
+        // probably are, so shouldn't enable / disable them here
+        // should just leave them on all the time?
         if flags & IRQFlags::VBLANK == IRQFlags::VBLANK {
             mmio::DISPSTAT.write(mmio::DISPSTAT.read() | (1 << 3));
         }
