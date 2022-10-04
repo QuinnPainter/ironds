@@ -5,8 +5,9 @@ ENTRY(__start)
 
 MEMORY {
     /* 512k of the 4MiB EWRAM is reserved for the ARM7 */
-    ewram (wx) : ORIGIN = 0x02380000, LENGTH = 512k
-    iwram (wx) : ORIGIN = 0x037F8000, LENGTH = 32K + 64K /* Uses 32K shared WRAM and the 64K ARM7 WRAM in one block */
+    ewram  (wx) : ORIGIN = 0x02380000, LENGTH = 512K - 4K
+    shared (w)  : ORIGIN = 0x023FF000, LENGTH = 4K
+    iwram  (wx) : ORIGIN = 0x037F8000, LENGTH = 32K + 64K /* Uses 32K shared WRAM and the 64K ARM7 WRAM in one block */
 }
 
 __svc_stack = ORIGIN(iwram) + LENGTH(iwram);

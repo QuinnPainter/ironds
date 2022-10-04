@@ -5,9 +5,10 @@ ENTRY(__start)
 
 MEMORY {
     /* 512k reserved for the ARM7 */
-    ewram (wx) : ORIGIN = 0x02000000, LENGTH = 4M - 512k
-    itcm  (wx) : ORIGIN = 0x01000000, LENGTH = 32K
-    dtcm  (w)  : ORIGIN = 0x02ff0000, LENGTH = 16K
+    ewram  (wx) : ORIGIN = 0x02000000, LENGTH = 4M - 512k
+    shared (w)  : ORIGIN = 0x023FF000, LENGTH = 4K
+    itcm   (wx) : ORIGIN = 0x01000000, LENGTH = 32K
+    dtcm   (w)  : ORIGIN = 0x02ff0000, LENGTH = 16K
 }
 
 __svc_stack = ORIGIN(dtcm) + LENGTH(dtcm);

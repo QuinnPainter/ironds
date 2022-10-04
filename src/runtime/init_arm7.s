@@ -1,4 +1,3 @@
-/* not allowed to use #define, for some reason? whatever, .set works. */
 .set ARM7_RESERVED_EWRAM_SIZE, 0x80000 /* 512K */
 .set ARM7_RESERVED_EWRAM_START, ((0x02000000 + 0x00400000) - ARM7_RESERVED_EWRAM_SIZE)
 

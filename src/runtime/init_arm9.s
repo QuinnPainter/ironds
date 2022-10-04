@@ -1,4 +1,3 @@
-/* not allowed to use #define, for some reason? whatever, .set works. */
 .set ARM7_RESERVED_EWRAM_SIZE, 0x80000 /* 512K */
 .set ARM7_RESERVED_EWRAM_START, ((0x02000000 + 0x00400000) - ARM7_RESERVED_EWRAM_SIZE)
 
@@ -61,7 +60,7 @@ __start:
     ldr r0, =((21 << 1) | 0x02000000 | 1) /* Size = 4M (2 << 21), base = 0x02000000, enable = 1 */
     mcr p15, 0, r0, c6, c1, 0
     /* Region 2 - ARM7 Reserved Main Memory */
-    ldr r0, =((18 << 1) | ARM7_RESERVED_EWRAM_START | 1) /* Size = 512K (2 << 18, enable = 1) */
+    ldr r0, =((18 << 1) | ARM7_RESERVED_EWRAM_START | 1) /* Size = 512K (2 << 18), enable = 1 */
     mcr p15, 0, r0, c6, c2, 0
     /* Region 3 - GBA Slot */
     ldr r0, =((26 << 1) | 0x08000000 | 1) /* Size = 128M (2 << 26), base = 0x08000000, enable = 1 */
@@ -76,9 +75,9 @@ __start:
     /* Region 6 - BIOS ROM */
     ldr r0, =((14 << 1) | 0xFFFF0000 | 1) /* Size = 32K (2 << 14), base = 0xFFFF0000, enable = 1 */
     mcr p15, 0, r0, c6, c6, 0
-    /* Region 7 - Unused */
-    /* todo - GBATEK recommends using this as a 4K space to share EWRAM between the ARM9 and ARM7 - not a bad idea? */
-    mov r0, #0 /* disable */
+    /* Region 7 - ARM9/ARM7 Shared Region */
+    /* todo - GBATEK says the minimum size is 4K, but is this true? it seems that smaller sizes should be possible. */
+    ldr r0, =((11 << 1) | (0x02400000 - 4096) | 1) /* Size = 4K (2 << 11), base = (end of RAM - 4K) = 0x023FF000, enable = 1 */
     mcr p15, 0, r0, c6, c7, 0
 
     /* Set region attributes */
