@@ -62,6 +62,8 @@ pub fn init_default() {
         core::ptr::copy_nonoverlapping(DEFAULT_PALETTE.as_ptr(),
             0x05000400 as *mut u16, DEFAULT_PALETTE.len() * size_of::<u16>());
     }
+
+    set_cursor_pos(0, 0);
 }
 
 /// Prints some text to the screen.

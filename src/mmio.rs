@@ -173,10 +173,9 @@ pub const IPCFIFOSEND: usize = 0x04000188;
 pub const IPCFIFORECV: usize = 0x04100000;
 
 // https://www.problemkaputt.de/gbatek.htm#dskeypad
-pub const KEYINPUT: usize = 0x04000130;
-pub const KEYCNT: usize = 0x04000132;
-#[cfg(feature = "arm7")]
-pub const EXTKEYIN: usize = 0x04000136;
+def_mmio!(0x0400_0130 = KEYINPUT: VolAddress<u16, Safe, ()>; ["arm9", "arm7"]; "Key Input");
+def_mmio!(0x0400_0132 = KEYCNT: VolAddress<u16, Safe, Safe>; ["arm9", "arm7"]; "Key Interrupt Control");
+def_mmio!(0x0400_0136 = EXTKEYIN: VolAddress<u16, Safe, ()>; ["arm7"]; "Extra Key Input");
 
 // https://www.problemkaputt.de/gbatek.htm#dsserialperipheralinterfacebusspi
 #[cfg(feature = "arm7")]

@@ -89,7 +89,7 @@ __start:
     mov r0, #0b00000010 /* only main memory can buffer writes */
     mcr p15, 0, r0, c3, c0, 0
     /* Read/Write Access */
-    ldr r0, =0x06333033 /* unused and arm7 reserved have no access, BIOS is read-only, rest are R/W */
+    ldr r0, =0x36333033 /* arm7 reserved has no access, BIOS is read-only, rest are R/W */
     mcr p15, 0, r0, c5, c0, 2 /* data */
     mcr p15, 0, r0, c5, c0, 3 /* instruction */
 
@@ -102,6 +102,11 @@ __start:
     ldr r0, =__bss_start /* Clear BSS */
     ldr r1, =__bss_size
     bl __init_zero_mem
+
+    ldr r0, =__shared_start /* Copy shared region from LMA to VMA */
+    ldr r1, =__shared_lma   /* todo: sync with arm7, to make sure this init happens before arm7 is running user code */
+    ldr r2, =__shared_size
+    bl __init_memcpy
 
     ldr r0, =__itcm_start /* Copy ITCM from LMA to VMA */
     ldr r1, =__itcm_lma

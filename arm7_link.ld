@@ -10,8 +10,9 @@ MEMORY {
     iwram  (wx) : ORIGIN = 0x037F8000, LENGTH = 32K + 64K /* Uses 32K shared WRAM and the 64K ARM7 WRAM in one block */
 }
 
-__svc_stack = ORIGIN(iwram) + LENGTH(iwram);
-__irq_stack = __svc_stack - 0x100;
+/* 0x100 padding for BIOS Variables like irq_vec. excessive, but whatever */
+__svc_stack = ORIGIN(iwram) + LENGTH(iwram) - 0x100;
+__irq_stack = __svc_stack - 0x100; /* 0x100 padding for each stack */
 __usr_stack = __irq_stack - 0x100;
 
 __irq_vec   = 0x0380FFFC;
@@ -56,6 +57,13 @@ SECTIONS {
 	__bss_size = __bss_end - __bss_start;
 	__heap_end = ORIGIN(ewram) + LENGTH(ewram);
 	__heap_size = __heap_end - __heap_start;
+
+    /* region of shared ARM9 / ARM7 memory, used for transferring data */
+    /* the SORT ensures that everything should be in the same order between ARM9 / ARM7 */
+    /* it is initialised by the ARM9, so no need to store it in the ARM7 binary */
+    .shared (NOLOAD) : {
+        *SORT(.shared*);
+    } > shared : NONE
 
     /* since heap is defined before IWRAM, they will overlap. */
     /* this should be fine, as the EWRAM LMAs are no longer needed */

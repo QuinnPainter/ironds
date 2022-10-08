@@ -11,8 +11,9 @@ MEMORY {
     dtcm   (w)  : ORIGIN = 0x02ff0000, LENGTH = 16K
 }
 
-__svc_stack = ORIGIN(dtcm) + LENGTH(dtcm);
-__irq_stack = __svc_stack - 0x100;
+/* 0x100 padding for BIOS Variables like irq_vec. excessive, but whatever */
+__svc_stack = ORIGIN(dtcm) + LENGTH(dtcm) - 0x100;
+__irq_stack = __svc_stack - 0x100; /* 0x100 padding for each stack */
 __usr_stack = __irq_stack - 0x100;
 
 __irq_vec = (ORIGIN(dtcm) + LENGTH(dtcm)) - 4;
@@ -26,6 +27,7 @@ PHDRS {
     main PT_LOAD FLAGS(7);
     itcm PT_LOAD FLAGS(7);
     dtcm PT_LOAD FLAGS(7);
+    shared PT_LOAD FLAGS(6); /* not executable */
 }
 
 SECTIONS {
@@ -66,9 +68,9 @@ SECTIONS {
 	__heap_end = ORIGIN(ewram) + LENGTH(ewram);
 	__heap_size = __heap_end - __heap_start;
 
-    /* since heap is defined before ITCM and DTCM, they will overlap. */
+    /* since heap is defined before the following sections, they will overlap. */
     /* this should be fine, as the EWRAM LMAs are no longer needed */
-    /* after they have been loaded into ITCM and DTCM. */
+    /* after they have been loaded into ITCM, DTCM and SHARED. */
     /* hopefully this isn't a stupid idea? */
 
     /* stuff loaded into ITCM */
@@ -91,6 +93,17 @@ SECTIONS {
         __dtcm_end = ABSOLUTE(.);
     } > dtcm AT> ewram : dtcm = 0xff
     __dtcm_size = __dtcm_end - __dtcm_start;
+
+    /* region of shared ARM9 / ARM7 memory, used for transferring data */
+    /* the SORT ensures that everything should be in the same order between ARM9 / ARM7 */
+    .shared : {
+        __shared_lma = LOADADDR(.shared);
+        __shared_start = ABSOLUTE(.); /* VMA */
+        *SORT(.shared*);
+        . = ALIGN(4);
+        __shared_end = ABSOLUTE(.);
+    } > shared AT> ewram : shared = 0xff
+    __shared_size = __shared_end - __shared_start;
 
     /* debugging sections */
     /* Stabs */
