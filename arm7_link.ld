@@ -72,7 +72,7 @@ SECTIONS {
         *(.bss*);
         . = ALIGN(4);
 		__bss_end = ABSOLUTE(.);
-    } > iwram : main
+    } > iwram : iwram
 	__bss_size = __bss_end - __bss_start;
     __heap_start = LOADADDR(.data) + SIZEOF(.data);
 	__heap_end = ORIGIN(ewram) + LENGTH(ewram);

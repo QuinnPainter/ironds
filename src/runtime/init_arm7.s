@@ -9,7 +9,6 @@
     .arm /* equivalent to "code 32" - sets the instruction set to ARM */
     .balign 4
 __start:
-    mov r11, r11
     /* make sure interrupts are disabled by turning IME to 0 */
     /* r0 is used both as address and as value (only bottom bit matters for IME) */
     mov r0, #0x04000000
@@ -34,6 +33,7 @@ __start:
     ldr r1, =__init_wait_for_ram
     ldr r2, =__init_wait_for_ram_end-__init_wait_for_ram
     bl __init_memcpy
+    ldr r1, =0x04000241 /* setup addr for wait loop */
     adr lr, 2f
     bx r12 /* call __init_wait_for_ram in IWRAM */
 2:
@@ -75,7 +75,6 @@ __start:
 __init_wait_for_ram:
     /* Wait until the ARM9 has assigned the shared RAM to the ARM7 */
     /* https://www.problemkaputt.de/gbatek.htm#dsmemorycontrolwram */
-    ldr r1, =0x04000241
 4:  ldrb r0, [r1]
     and r0, r0, #3
     cmp r0, #3
