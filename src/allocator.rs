@@ -36,7 +36,6 @@ unsafe impl Sync for ACSLAlloc {}
 
 unsafe impl GlobalAlloc for ACSLAlloc {
     #[cfg_attr(feature = "arm9", link_section = ".itcm.alloc")]
-    #[cfg_attr(feature = "arm7", link_section = ".iwram.alloc")]
     #[instruction_set(arm::a32)]
     #[inline(never)]
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
@@ -123,7 +122,6 @@ unsafe impl GlobalAlloc for ACSLAlloc {
     }
 
     #[cfg_attr(feature = "arm9", link_section = ".itcm.dealloc")]
-    #[cfg_attr(feature = "arm7", link_section = ".iwram.dealloc")]
     #[instruction_set(arm::a32)]
     #[inline(never)]
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {

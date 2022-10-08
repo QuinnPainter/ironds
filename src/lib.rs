@@ -18,7 +18,6 @@ use core::fmt::Write;
 
 #[global_allocator]
 #[cfg_attr(feature = "arm9", link_section = ".dtcm.alloc")]
-#[cfg_attr(feature = "arm7", link_section = ".iwram.alloc")]
 static mut ALLOCATOR: allocator::ACSLAlloc = allocator::ACSLAlloc::new();
 
 pub mod runtime;

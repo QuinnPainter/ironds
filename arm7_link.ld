@@ -27,23 +27,43 @@ PHDRS {
 }
 
 SECTIONS {
-    /* where EWRAM resident code goes */
-    .text : {
-        *(.text*);
+    /* where EWRAM resident code (mostly just the init script) and any init-ed EWRAM data goes */
+    .ewram : {
+        *(.ewram*);
         . = ALIGN(4);
     } > ewram : main = 0xff /* this means 0xFF is used for padding, I think? */
 
+    /* where IWRAM resident code (most code) goes */
+    /* LMA = address in EWRAM, VMA = address in IWRAM */
+    .text : {
+        __text_lma = LOADADDR(.text);
+        __text_start = ABSOLUTE(.); /* VMA */
+        *(.text*);
+        *(.iwram*);
+        . = ALIGN(4);
+        __text_end = ABSOLUTE(.);
+    } > iwram AT> ewram : iwram = 0xff
+    __text_size = __text_end - __text_start;
+
     /* read only stuff, like string literals */
     .rodata : {
+        __rodata_lma = LOADADDR(.rodata);
+        __rodata_start = ABSOLUTE(.); /* VMA */
         *(.rodata*);
         . = ALIGN(4);
-    } > ewram : main = 0xff
+        __rodata_end = ABSOLUTE(.);
+    } > iwram AT> ewram : iwram = 0xff
+    __rodata_size = __rodata_end - __rodata_start;
 
     /* initialised variables */
     .data : {
+        __data_lma = LOADADDR(.data);
+        __data_start = ABSOLUTE(.); /* VMA */
         *(.data*);
         . = ALIGN(4);
-    } > ewram : main = 0xff
+        __data_end = ABSOLUTE(.);
+    } > iwram AT> ewram : iwram = 0xff
+    __data_size = __data_end - __data_start;
 
     /* uninitialised variables */
 	/* NOLOAD makes the section not loaded at runtime, so it doesn't occupy ROM */
@@ -52,9 +72,9 @@ SECTIONS {
         *(.bss*);
         . = ALIGN(4);
 		__bss_end = ABSOLUTE(.);
-		__heap_start = ABSOLUTE(.);
-    } > ewram : main
+    } > iwram : main
 	__bss_size = __bss_end - __bss_start;
+    __heap_start = LOADADDR(.data) + SIZEOF(.data);
 	__heap_end = ORIGIN(ewram) + LENGTH(ewram);
 	__heap_size = __heap_end - __heap_start;
 
@@ -64,21 +84,6 @@ SECTIONS {
     .shared (NOLOAD) : {
         *SORT(.shared*);
     } > shared : NONE
-
-    /* since heap is defined before IWRAM, they will overlap. */
-    /* this should be fine, as the EWRAM LMAs are no longer needed */
-    /* after they have been loaded into IWRAM. */
-    /* hopefully this isn't a stupid idea? */
-
-    /* LMA = address in EWRAM, VMA = address in IWRAM */
-    .iwram : {
-        __iwram_lma = LOADADDR(.iwram);
-        __iwram_start = ABSOLUTE(.); /* VMA */
-        *(.iwram*);
-        . = ALIGN(4);
-        __iwram_end = ABSOLUTE(.);
-    } > iwram AT> ewram : iwram = 0xff
-    __iwram_size = __iwram_end - __iwram_start;
 
     /* debugging sections */
     /* Stabs */

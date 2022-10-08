@@ -55,7 +55,6 @@ pub macro critical_section($code:block) {
 
 #[no_mangle]
 #[cfg_attr(feature = "arm9", link_section = ".itcm.irq_handler_ptr")]
-#[cfg_attr(feature = "arm7", link_section = ".iwram.irq_handler_ptr")]
 static mut USER_IRQ_HANDLER: Option<extern "C" fn(IRQFlags)> = None;
 
 pub enum IRQType {

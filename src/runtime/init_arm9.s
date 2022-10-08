@@ -6,7 +6,7 @@
     /* note - many of the double underscore symbols
        are defined in the linkerscript */
 
-    .section .text.rt0
+    .section .text.rt0, "ax"
     .arm /* equivalent to "code 32" - sets the instruction set to ARM */
     .balign 4
 __start:
