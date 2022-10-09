@@ -95,6 +95,7 @@ pub const BG3YOFS_MAIN: usize = 0x0400001E;
 #[cfg(feature = "arm9")]
 pub const BG3YOFS_SUB: usize = 0x0400101E;
 
+// arm9 and arm7 have their own separate DISPSTATS
 def_mmio!(0x0400_0004 = DISPSTAT: VolAddress<u16, Safe, Safe>; ["arm9", "arm7"]; "Display Status");
 def_mmio!(0x0400_0006 = VCOUNT: VolAddress<u16, Safe, Safe>; ["arm9", "arm7"]; "Vertical Counter");
 

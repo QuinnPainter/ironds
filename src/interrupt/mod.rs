@@ -123,9 +123,6 @@ pub fn irq_set_handler(f: Option<extern "C" fn(IRQFlags)>) {
 pub fn irq_enable(flags: IRQFlags) {
     critical_section!({
         unsafe { write_volatile(mmio::IE as *mut u32, read_volatile(mmio::IE as *mut u32) | flags.bits()); }
-        // todo: are these dispstat flags shared between ARM9/ARM7?
-        // probably are, so shouldn't enable / disable them here
-        // should just leave them on all the time?
         if flags & IRQFlags::VBLANK == IRQFlags::VBLANK {
             mmio::DISPSTAT.write(mmio::DISPSTAT.read() | (1 << 3));
         }
@@ -154,4 +151,22 @@ pub fn irq_disable(flags: IRQFlags) {
         }
         // todo: also disable IPCSync
     });
+}
+
+/// Wait for an interrupt to occur, then continue.
+/// 
+/// Waits for one of the interrupts specified in `flags` to happen.  
+/// Make sure interrupts are enabled before calling this!
+pub fn wait_for_interrupt(flags: IRQFlags) {
+    // todo: replace this with local implementation, bios version is bugged
+    crate::syscall::intr_wait(1, flags.bits(), 0);
+}
+
+/// Waits for the VBlank interrupt, then continues.
+/// 
+/// Equivalent to `wait_for_interrupt(IRQFlags::VBLANK)`.  
+/// Make sure interrupts are enabled before calling this!
+pub fn wait_for_vblank() {
+    // todo: replace this with local implementation, bios version is bugged
+    crate::syscall::vblank_intr_wait();
 }

@@ -199,8 +199,6 @@ pub fn get_sub_bg_control(bg: usize) -> BackgroundControl {
 /// Valid values are from 0 to 262.
 /// 0 is the top of the screen, 191 is the bottom.
 /// 192 to 262 are during VBlank.
-/// 
-/// NOTE: This is shared between ARM9 and ARM7.
 #[inline]
 pub fn set_vcount_trigger(line: u16) {
     debug_assert!(line < 263, "vcount trigger must be from 0 to 262 (was: {})", line);
