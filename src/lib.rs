@@ -2,7 +2,7 @@
 
 #![no_std]
 #![feature(decl_macro)]
-#![feature(isa_attribute)]
+// todo:could maybe switch to default_alloc_error_handler?
 #![feature(alloc_error_handler)]
 //#![warn(missing_docs)]
 
