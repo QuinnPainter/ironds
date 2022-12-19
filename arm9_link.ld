@@ -31,11 +31,11 @@ PHDRS {
 }
 
 SECTIONS {
-	/* Secure area. usually 0 filled for 2048 bytes */
-	/* https://problemkaputt.de/gbatek.htm#dscartridgesecurearea */
-	.secure : {
-		KEEP(*(.secure));
-	} > ewram : main = 0x00
+    /* Secure area. usually 0 filled for 2048 bytes */
+    /* https://problemkaputt.de/gbatek.htm#dscartridgesecurearea */
+    .secure : {
+        KEEP(*(.secure));
+    } > ewram : main = 0x00
 
     /* where EWRAM resident code goes */
     .text : {
@@ -56,21 +56,21 @@ SECTIONS {
     } > ewram : main = 0xff
 
     /* uninitialised variables */
-	/* NOLOAD makes the section not loaded at runtime, so it doesn't occupy ROM */
+    /* NOLOAD makes the section not loaded at runtime, so it doesn't occupy ROM */
     /* the decision to lay things out this way means this is only compatible with ndstool pre-2.2.0 */
     /* https://github.com/devkitPro/ndstool/commit/21bbea5731cbcf6f9b46245646f28f910db7a74a */
     /* since it was changed to not allow "holes" between PHDR sections */
     /* so bss would need to be moved to the end, which would mean losing the heap overlap optimisation */
     .bss (NOLOAD) : {
-		__bss_start = ABSOLUTE(.);
+        __bss_start = ABSOLUTE(.);
         *(.bss*);
         . = ALIGN(4);
-		__bss_end = ABSOLUTE(.);
-		__heap_start = ABSOLUTE(.);
+        __bss_end = ABSOLUTE(.);
+        __heap_start = ABSOLUTE(.);
     } > ewram : main
-	__bss_size = __bss_end - __bss_start;
-	__heap_end = ORIGIN(ewram) + LENGTH(ewram);
-	__heap_size = __heap_end - __heap_start;
+    __bss_size = __bss_end - __bss_start;
+    __heap_end = ORIGIN(ewram) + LENGTH(ewram);
+    __heap_size = __heap_end - __heap_start;
 
     /* since heap is defined before the following sections, they will overlap. */
     /* this should be fine, as the EWRAM LMAs are no longer needed */

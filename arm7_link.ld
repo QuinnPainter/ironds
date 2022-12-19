@@ -66,17 +66,17 @@ SECTIONS {
     __data_size = __data_end - __data_start;
 
     /* uninitialised variables */
-	/* NOLOAD makes the section not loaded at runtime, so it doesn't occupy ROM */
+    /* NOLOAD makes the section not loaded at runtime, so it doesn't occupy ROM */
     .bss (NOLOAD) : {
-		__bss_start = ABSOLUTE(.);
+        __bss_start = ABSOLUTE(.);
         *(.bss*);
         . = ALIGN(4);
-		__bss_end = ABSOLUTE(.);
+        __bss_end = ABSOLUTE(.);
     } > iwram : iwram
-	__bss_size = __bss_end - __bss_start;
+    __bss_size = __bss_end - __bss_start;
     __heap_start = LOADADDR(.data) + SIZEOF(.data);
-	__heap_end = ORIGIN(ewram) + LENGTH(ewram);
-	__heap_size = __heap_end - __heap_start;
+    __heap_end = ORIGIN(ewram) + LENGTH(ewram);
+    __heap_size = __heap_end - __heap_start;
 
     /* region of shared ARM9 / ARM7 memory, used for transferring data */
     /* the SORT ensures that everything should be in the same order between ARM9 / ARM7 */
