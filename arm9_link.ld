@@ -57,6 +57,10 @@ SECTIONS {
 
     /* uninitialised variables */
 	/* NOLOAD makes the section not loaded at runtime, so it doesn't occupy ROM */
+    /* the decision to lay things out this way means this is only compatible with ndstool pre-2.2.0 */
+    /* https://github.com/devkitPro/ndstool/commit/21bbea5731cbcf6f9b46245646f28f910db7a74a */
+    /* since it was changed to not allow "holes" between PHDR sections */
+    /* so bss would need to be moved to the end, which would mean losing the heap overlap optimisation */
     .bss (NOLOAD) : {
 		__bss_start = ABSOLUTE(.);
         *(.bss*);
