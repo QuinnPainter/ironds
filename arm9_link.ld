@@ -55,28 +55,6 @@ SECTIONS {
         . = ALIGN(4);
     } > ewram : main = 0xff
 
-    /* uninitialised variables */
-    /* NOLOAD makes the section not loaded at runtime, so it doesn't occupy ROM */
-    /* the decision to lay things out this way means this is only compatible with ndstool pre-2.2.0 */
-    /* https://github.com/devkitPro/ndstool/commit/21bbea5731cbcf6f9b46245646f28f910db7a74a */
-    /* since it was changed to not allow "holes" between PHDR sections */
-    /* so bss would need to be moved to the end, which would mean losing the heap overlap optimisation */
-    .bss (NOLOAD) : {
-        __bss_start = ABSOLUTE(.);
-        *(.bss*);
-        . = ALIGN(4);
-        __bss_end = ABSOLUTE(.);
-        __heap_start = ABSOLUTE(.);
-    } > ewram : main
-    __bss_size = __bss_end - __bss_start;
-    __heap_end = ORIGIN(ewram) + LENGTH(ewram);
-    __heap_size = __heap_end - __heap_start;
-
-    /* since heap is defined before the following sections, they will overlap. */
-    /* this should be fine, as the EWRAM LMAs are no longer needed */
-    /* after they have been loaded into ITCM, DTCM and SHARED. */
-    /* hopefully this isn't a stupid idea? */
-
     /* stuff loaded into ITCM */
     /* LMA = address in EWRAM, VMA = address in ITCM */
     .itcm : {
@@ -108,6 +86,21 @@ SECTIONS {
         __shared_end = ABSOLUTE(.);
     } > shared AT> ewram : shared = 0xff
     __shared_size = __shared_end - __shared_start;
+
+    /* uninitialised variables */
+    /* NOLOAD makes the section not loaded at runtime, so it doesn't occupy ROM */
+    /* todo: could put the BSS VMA overlap with the LMAs of ITCM/DTCM */
+    /* and make sure to copy those before clearing BSS in the init script to save some RAM */
+    .bss (NOLOAD) : {
+        __bss_start = ABSOLUTE(.);
+        *(.bss*);
+        . = ALIGN(4);
+        __bss_end = ABSOLUTE(.);
+        __heap_start = ABSOLUTE(.);
+    } > ewram : NONE
+    __bss_size = __bss_end - __bss_start;
+    __heap_end = ORIGIN(ewram) + LENGTH(ewram);
+    __heap_size = __heap_end - __heap_start;
 
     /* debugging sections */
     /* Stabs */
