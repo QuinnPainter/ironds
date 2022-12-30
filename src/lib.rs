@@ -2,8 +2,6 @@
 
 #![no_std]
 #![feature(decl_macro)]
-// todo:could maybe switch to default_alloc_error_handler?
-#![feature(alloc_error_handler)]
 //#![warn(missing_docs)]
 
 // Doc builds with both arm9 and arm7 enabled so docs for both CPUs get generated
@@ -104,9 +102,4 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     }
     // todo: arm7 panic should send message to arm9 to display message
     loop {}
-}
-
-#[alloc_error_handler]
-fn alloc_error(layout: core::alloc::Layout) -> ! {
-    panic!("memory allocation of {} bytes failed", layout.size())
 }
