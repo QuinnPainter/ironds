@@ -83,13 +83,14 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
 
     interrupt::disable_ime();
     let mut output: String = String::new();
-    let printed_output: &str;
+    // todo: the underscore here silences warnings about this variable being unused on arm7
+    let _printed_output: &str;
     // Reserve enough chars to fill the screen
     if output.try_reserve_exact(32 * 24).is_err() {
-        printed_output = concat!(ERR_HEADER!(), "Allocation failed: Out of memory");
+        _printed_output = concat!(ERR_HEADER!(), "Allocation failed: Out of memory");
     }
     else {
-        printed_output = match write!(&mut output, "{}", info) {
+        _printed_output = match write!(&mut output, "{}", info) {
             Ok(_) => { output.insert_str(0, ERR_HEADER!()); output.as_str() },
             Err(_) => concat!(ERR_HEADER!(), "Error formatting panic message.\nHow did this happen?"),
         };
@@ -97,7 +98,7 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     #[cfg(feature = "arm9")]
     {
         display::console::init_default();
-        display::console::print(printed_output);
+        display::console::print(_printed_output);
         // arm9 panic should send message to halt arm7?
     }
     // todo: arm7 panic should send message to arm9 to display message
