@@ -30,6 +30,7 @@ pub mod agbabi;
 pub mod syscall;
 pub mod shared;
 pub mod input;
+pub mod sync;
 
 // Accessing variables from the linkerscript is weird.
 // https://stackoverflow.com/questions/72820626/how-to-access-a-variable-from-linker-script-in-rust-code?noredirect=1&lq=1
