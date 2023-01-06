@@ -4,7 +4,6 @@
 use voladdress::{VolAddress, VolBlock, Safe};
 
 // thanks rust-console/gba, this is a good idea!
-// todo: does this little snippet justify a license dependency??
 macro_rules! def_mmio {
     ($addr:literal = $name:ident : $t:ty; [ $($cpu:expr),+ ] $(; $comment:expr )?) => {
         // redirect a call **without** an alias list to just pass an empty alias list

@@ -11,3 +11,4 @@ Would recommend using [ironds-template](https://github.com/QuinnPainter/ironds-t
 - Console font is [BESCII](https://github.com/damianvila/font-bescii), licensed under CC0 1.0 Universal.
 - Optimised functions provided by [agbabi](https://github.com/felixjones/agbabi), under the zlib license.
 - Memory allocator provided by [ACSL](https://codeberg.org/pgimeno/ACSL), under the ISC license.
+- Various functions provided by [rust-console/gba](https://github.com/rust-console/gba), under a zlib OR Apache 2.0 OR MIT license.
