@@ -1,7 +1,7 @@
 {
     // needed for no-std, prevents the "can't find crate for 'test'" issue
-    "rust-analyzer.checkOnSave.allTargets": false,
-    "rust-analyzer.checkOnSave.extraArgs": [
+    "rust-analyzer.check.allTargets": false,
+    "rust-analyzer.check.extraArgs": [
         "--lib"
     ],
     "rust-analyzer.cargo.target": "thumbv5te-none-eabi",
