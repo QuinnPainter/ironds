@@ -8,6 +8,7 @@ use core::ptr::{read_volatile, write_volatile};
 use core::arch::global_asm;
 use bitflags::bitflags;
 use crate::mmio;
+use crate::sync::{NdsCell, NdsCellSafe};
 
 global_asm! {
     include_str!("irq_handler.s"),
@@ -55,7 +56,8 @@ pub macro critical_section($code:block) {
 
 #[no_mangle]
 #[cfg_attr(feature = "arm9", link_section = ".itcm.irq_handler_ptr")]
-static mut USER_IRQ_HANDLER: Option<extern "C" fn(IRQFlags)> = None;
+static USER_IRQ_HANDLER: NdsCell<Option<extern "C" fn(IRQFlags)>> = NdsCell::new(None);
+unsafe impl NdsCellSafe for Option<extern "C" fn(IRQFlags)> {}
 
 pub enum IRQType {
     Vblank = 0,
@@ -117,7 +119,7 @@ bitflags! {
 
 #[inline(always)]
 pub fn irq_set_handler(f: Option<extern "C" fn(IRQFlags)>) {
-    unsafe { USER_IRQ_HANDLER = f; }
+    USER_IRQ_HANDLER.write(f);
 }
 
 pub fn irq_enable(flags: IRQFlags) {
