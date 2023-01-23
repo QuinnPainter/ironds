@@ -26,10 +26,10 @@ pub fn print (s: &str) {
                 ".hword 0", // flags?
                 "2:",
                 ".space 101", // extra byte for 0 terminator
+                ".align",
                 "3:",
                 "bx r3", // separate bx since arm7 doesn't have blx
                 "4:",
-                ".align",
                 in("r1") chunk as *const [u8] as *const u8, // inline version of ".as_ptr()"
                 in("r2") chunk.len(),
                 out("r4") _,
