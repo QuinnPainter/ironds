@@ -3,7 +3,6 @@
 //! This module is very limited, and should only really be used for debug purposes.
 
 use crate::{display, mmio};
-use core::mem::size_of;
 
 static DEFAULT_FONT: &[u8; 4096] = include_bytes!("../../gfx/font.img.bin");
 const DEFAULT_PALETTE: [u16; 2] = [display::rgb15(0x000000), display::rgb15(0xFFFFFF)];
@@ -60,7 +59,7 @@ pub fn init_default() {
 
         // load palette into sub-bg palette RAM
         core::ptr::copy_nonoverlapping(DEFAULT_PALETTE.as_ptr(),
-            0x05000400 as *mut u16, DEFAULT_PALETTE.len() * size_of::<u16>());
+            0x05000400 as *mut u16, DEFAULT_PALETTE.len());
     }
 
     set_cursor_pos(0, 0);
