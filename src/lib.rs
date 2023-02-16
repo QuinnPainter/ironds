@@ -4,6 +4,11 @@
 #![feature(decl_macro)]
 //#![warn(missing_docs)]
 
+// make clippy stop yelling about "useless ops" like 0 | (0 << 3)
+#![allow(clippy::identity_op)]
+#![allow(clippy::eq_op)]
+#![allow(clippy::manual_range_contains)] // what the heck, clippy? this suggestion sucks...
+
 // Doc builds with both arm9 and arm7 enabled so docs for both CPUs get generated
 #[cfg(all(feature = "arm9", feature = "arm7", not(doc)))]
 compile_error!("Feature \"arm9\" and feature \"arm7\" cannot be enabled at the same time");
@@ -85,17 +90,15 @@ fn panic(info: &core::panic::PanicInfo) -> ! {
     interrupt::disable_ime();
     let mut output: String = String::new();
     // todo: the underscore here silences warnings about this variable being unused on arm7
-    let _printed_output: &str;
     // Reserve enough chars to fill the screen
-    if output.try_reserve_exact(32 * 24).is_err() {
-        _printed_output = concat!(ERR_HEADER!(), "Allocation failed: Out of memory");
-    }
-    else {
-        _printed_output = match write!(&mut output, "{}", info) {
+    let _printed_output = if output.try_reserve_exact(32 * 24).is_err() {
+        concat!(ERR_HEADER!(), "Allocation failed: Out of memory")
+    } else {
+        match write!(&mut output, "{info}") {
             Ok(_) => { output.insert_str(0, ERR_HEADER!()); output.as_str() },
             Err(_) => concat!(ERR_HEADER!(), "Error formatting panic message.\nHow did this happen?"),
-        };
-    }
+        }
+    };
     #[cfg(feature = "arm9")]
     {
         display::console::init_default();

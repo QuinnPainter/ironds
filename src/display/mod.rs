@@ -201,6 +201,6 @@ pub fn get_sub_bg_control(bg: usize) -> BackgroundControl {
 /// 192 to 262 are during VBlank.
 #[inline]
 pub fn set_vcount_trigger(line: u16) {
-    debug_assert!(line < 263, "vcount trigger must be from 0 to 262 (was: {})", line);
+    debug_assert!(line < 263, "vcount trigger must be from 0 to 262 (was: {line})");
     mmio::DISPSTAT.apply(|x| *x = (*x & 0x007F) | (line << 8) | ((line >> 1) & 0x80));
 }

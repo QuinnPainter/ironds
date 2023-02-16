@@ -25,8 +25,8 @@ pub fn return_from_main() -> ! {
 }
 
 // pad out the secure area so the cart isn't encrypted
+// this could be moved to the linkerscript, not sure if there's value having it here
 #[doc(hidden)]
 #[cfg(feature = "arm9")]
 #[link_section = ".secure"]
-#[no_mangle]
 pub static SECURE_PADDING: [u8; 2048] = [0; 2048];

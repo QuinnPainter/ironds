@@ -256,6 +256,9 @@ unsafe impl NdsCellSafe for u8 {}
 /// Therefore, any 32 bit / 8 bit types (u8, u32, function pointers, etc.) should
 /// impl both NdsCellSafe and NdsCellSwapSafe, while 16 bit types should impl
 /// only NdsCellSafe.
+/// 
+/// ## Safety
+/// All the same rules as [`NdsCellSafe`] apply, in addition the type must be either 32 bit or 8 bit.
 pub unsafe trait NdsCellSwapSafe: NdsCellSafe {}
 
 unsafe impl NdsCellSwapSafe for bool {}

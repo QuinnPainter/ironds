@@ -72,7 +72,7 @@ pub fn init_default() {
 /// Make sure you have initialised the console before running this function.
 pub fn print(txt: &str) {
     for mut b in txt.bytes() {
-        if b == '\n' as u8 {
+        if b == b'\n' {
             unsafe { CURSOR_Y += 1; CURSOR_X = 0; }
             continue;
         }

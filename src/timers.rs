@@ -1,5 +1,5 @@
 //! Module for utilising the hardware timers.
-#![allow(dead_code)]
+#![allow(dead_code)] // for unused consts like PRESCALER_64
 
 use core::ptr;
 use crate::mmio;
@@ -50,6 +50,6 @@ pub fn end_profiler_timer(timer_index: u32) -> u32 {
         // stop both timers
         ptr::write_volatile((first_timer_addr + 0) as *mut u32, 0);
         ptr::write_volatile((first_timer_addr + 4) as *mut u32, 0);
-        return ((high as u32) << 16) | (low as u32);
+        ((high as u32) << 16) | (low as u32)
     }
 }
