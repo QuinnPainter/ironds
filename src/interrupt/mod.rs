@@ -90,6 +90,7 @@ pub enum IRQType {
 
 bitflags! {
     #[repr(transparent)]
+    #[derive(Clone, Copy, PartialEq, Eq)]
     pub struct IRQFlags: u32 {
         const VBLANK = 1 << IRQType::Vblank as u32;
         const HBLANK = 1 << IRQType::Hblank as u32;

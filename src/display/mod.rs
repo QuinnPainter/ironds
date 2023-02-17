@@ -13,13 +13,15 @@ const POWCNT1: VolAddress<u32, Safe, Safe> = unsafe { VolAddress::new(mmio::POWC
 
 // Used with power_on and power_off
 bitflags! {
+    #[repr(transparent)]
+    #[derive(Clone, Copy, PartialEq, Eq)]
     pub struct GfxPwr: u32 {
         const MAIN_2D = 1 << 1;
         const SUB_2D = 1 << 9;
         const RENDER_3D = 1 << 2;
         const GEOMETRY_3D = 1 << 3;
-        const ALL_2D = Self::MAIN_2D.bits | Self::SUB_2D.bits;
-        const ALL = Self::ALL_2D.bits | Self::RENDER_3D.bits | Self::GEOMETRY_3D.bits; 
+        const ALL_2D = Self::MAIN_2D.bits() | Self::SUB_2D.bits();
+        const ALL = Self::ALL_2D.bits() | Self::RENDER_3D.bits() | Self::GEOMETRY_3D.bits(); 
     }
 }
 
@@ -109,13 +111,13 @@ pub const fn rgb15(x: u32) -> u16 {
 /// Turns the specified graphics engines on (using POWCNT1).
 #[cfg(feature = "arm9")]
 pub fn power_on(pwrflags: GfxPwr) {
-    POWCNT1.write(POWCNT1.read() | pwrflags.bits);
+    POWCNT1.write(POWCNT1.read() | pwrflags.bits());
 }
 
 /// Turns the specified graphics engines off (using POWCNT1).
 #[cfg(feature = "arm9")]
 pub fn power_off(pwrflags: GfxPwr) {
-    POWCNT1.write(POWCNT1.read() & !pwrflags.bits);
+    POWCNT1.write(POWCNT1.read() & !pwrflags.bits());
 }
 
 /// Sets which graphics engine corresponds with which display (top or bottom).

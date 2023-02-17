@@ -7,6 +7,7 @@ use crate::{shared, mmio};
 
 bitflags! {
     #[repr(transparent)]
+    #[derive(Clone, Copy, PartialEq, Eq)]
     pub struct Buttons: u32 {
         const A = 1 << 0;
         const B = 1 << 1;
@@ -37,14 +38,12 @@ bitflags! {
 pub fn scan_keys() {
     let keys: u32 = ((mmio::EXTKEYIN.read() as u32) << 16) | mmio::KEYINPUT.read() as u32;
     unsafe {
-        ptr::write_volatile(&mut shared::SHARED_DATA.buttons.bits as *mut u32, !keys);
+        ptr::write_volatile(ptr::addr_of_mut!(shared::SHARED_DATA.buttons.0.bits), !keys);
     }
 }
 
 pub fn read_keys() -> Buttons {
     unsafe {
-        Buttons {
-            bits: ptr::read_volatile(&mut shared::SHARED_DATA.buttons.bits as *mut u32)
-        }
+        Buttons::from_bits_retain(ptr::read_volatile(ptr::addr_of!(shared::SHARED_DATA.buttons.0.bits)))
     }
 }
