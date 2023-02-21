@@ -52,8 +52,8 @@ pub fn init_default() {
         .with_tilemap_base(4) // 8K offset
         .with_screen_size(0));
 
-    unsafe { core::ptr::write_volatile(mmio::BG0XOFS_SUB as *mut u16, 0); }
-    unsafe { core::ptr::write_volatile(mmio::BG0YOFS_SUB as *mut u16, 0); }
+    mmio::BG0XOFS_SUB.write(0);
+    mmio::BG0YOFS_SUB.write(0);
 
     unsafe {
         // fill tilemap with space characters
