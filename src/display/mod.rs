@@ -4,7 +4,7 @@ pub use vram::*;
 
 use core::ptr::{read_volatile, write_volatile};
 use bitflags::bitflags;
-use modular_bitfield::prelude::*;
+use bitfield_struct::bitfield;
 use voladdress::*;
 use crate::mmio;
 
@@ -25,10 +25,10 @@ bitflags! {
     }
 }
 
-#[bitfield]
-#[repr(u32)]
+#[bitfield(u32)]
 pub struct DisplayControlMain {
-    pub bg_mode: B3, // enum
+    #[bits(3)]
+    pub bg_mode: u8, // enum
     pub bg0_3d: bool,
     pub tile_obj_mapping: bool, // enum
     pub bm_obj_2d_dim: bool, // enum
@@ -42,22 +42,28 @@ pub struct DisplayControlMain {
     pub display_win0: bool,
     pub display_win1: bool,
     pub display_obj_win: bool,
-    pub display_mode: B2, // enum
-    pub vram_display_block: B2, // enum
-    pub tile_obj_1d_bound: B2,
-    pub bm_obj_1d_bound: B1,
+    #[bits(2)]
+    pub display_mode: u8, // enum
+    #[bits(2)]
+    pub vram_display_block: u8, // enum
+    #[bits(2)]
+    pub tile_obj_1d_bound: u8,
+    #[bits(1)]
+    pub bm_obj_1d_bound: u8,
     pub obj_during_hblank: bool,
-    pub master_tiledata_base: B3,
-    pub master_tilemap_base: B3,
+    #[bits(3)]
+    pub master_tiledata_base: u8,
+    #[bits(3)]
+    pub master_tilemap_base: u8,
     pub bg_ext_pal_enabled: bool,
     pub obj_ext_pal_enabled: bool,
 }
 
-#[bitfield]
-#[repr(u32)]
+#[bitfield(u32)]
 pub struct DisplayControlSub {
-    pub bg_mode: B3, // enum (different)
-    #[skip] __: bool,
+    #[bits(3)]
+    pub bg_mode: u8, // enum (different)
+    _p: bool,
     pub tile_obj_mapping: bool, // enum
     pub bm_obj_2d_dim: bool, // enum
     pub bm_obj_mapping: bool, // enum
@@ -70,26 +76,35 @@ pub struct DisplayControlSub {
     pub display_win0: bool,
     pub display_win1: bool,
     pub display_obj_win: bool,
-    pub display_mode: B2, // enum (different)
-    #[skip] __: B2,
-    pub tile_obj_1d_bound: B2,
-    #[skip] __: B1,
+    #[bits(2)]
+    pub display_mode: u8, // enum (different)
+    #[bits(2)]
+    _p: u8,
+    #[bits(2)]
+    pub tile_obj_1d_bound: u8,
+    _p: bool,
     pub obj_during_hblank: bool,
-    #[skip] __: B6,
+    #[bits(6)]
+    _p: u8,
     pub bg_ext_pal_enabled: bool,
     pub obj_ext_pal_enabled: bool,
 }
 
-#[bitfield]
-#[repr(u16)]
+#[bitfield(u16)]
 pub struct BackgroundControl {
-    pub priority: B2, // lower = higher priority
-    pub tiledata_base: B4,
+    #[bits(2)]
+    pub priority: u8, // lower = higher priority
+    #[bits(4)]
+    pub tiledata_base: u8,
     pub mosaic_enabled: bool,
-    pub palette_setting: B1, // enum
-    pub tilemap_base: B5,
-    pub bit13: B1, // BG0/BG1 = Ext Palette Slot. BG2/BG3 = Display Area Overflow (0=Transparent, 1=Wraparound)
-    pub screen_size: B2,
+    #[bits(1)]
+    pub palette_setting: u8, // enum
+    #[bits(5)]
+    pub tilemap_base: u8,
+    #[bits(1)]
+    pub bit13: u8, // BG0/BG1 = Ext Palette Slot. BG2/BG3 = Display Area Overflow (0=Transparent, 1=Wraparound)
+    #[bits(2)]
+    pub screen_size: u8,
 }
 
 pub enum MainEnginePos {
