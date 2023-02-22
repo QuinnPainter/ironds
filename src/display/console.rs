@@ -57,16 +57,16 @@ pub fn init_default() {
 
     unsafe {
         // fill tilemap with space characters
-        core::ptr::write_bytes((0x6200000 + 8192) as *mut u16, 32, 32 * 24);
+        core::ptr::write_bytes((mmio::BG_RAM_BASE_SUB + 8192) as *mut u16, 32, 32 * 24);
 
         // load font into sub-bg VRAM
         // vram doesn't support 8 bit loads, must load as 16 bit
         core::ptr::copy_nonoverlapping(DEFAULT_FONT.as_ptr() as *const u16,
-            0x06200000 as *mut u16, DEFAULT_FONT.len() / 2);
+            mmio::BG_RAM_BASE_SUB as *mut u16, DEFAULT_FONT.len() / 2);
 
         // load palette into sub-bg palette RAM
         core::ptr::copy_nonoverlapping(DEFAULT_PALETTE.as_ptr(),
-            0x05000400 as *mut u16, DEFAULT_PALETTE.len());
+            mmio::PALETTE_RAM_BASE_SUB as *mut u16, DEFAULT_PALETTE.len());
     }
 
     set_cursor_pos(0, 0);

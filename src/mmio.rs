@@ -88,6 +88,15 @@ pub const DISPCAPCNT: usize = 0x04000064;
 #[cfg(feature = "arm9")]
 pub const DISP_MMEM_FIFO: usize = 0x04000068;
 
+pub const PALETTE_RAM_BASE_MAIN: usize = 0x05000000;
+pub const PALETTE_RAM_BASE_SUB: usize = 0x05000400;
+pub const BG_RAM_BASE_MAIN: usize = 0x06000000;
+pub const BG_RAM_BASE_SUB: usize = 0x06200000;
+pub const OBJ_RAM_BASE_MAIN: usize = 0x06400000;
+pub const OBJ_RAM_BASE_SUB: usize = 0x06600000;
+pub const OAM_BASE_MAIN: usize = 0x07000000;
+pub const OAM_BASE_SUB: usize = 0x07000400;
+
 // https://www.problemkaputt.de/gbatek.htm#dsdmatransfers
 pub const DMA0SAD: usize = 0x040000B0;
 pub const DMA1SAD: usize = 0x040000BC;

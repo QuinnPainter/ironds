@@ -5,6 +5,11 @@
 use core::arch::asm;
 use crate::mmio;
 
+//todo: setup nocash write and graphical console write with fmt::write
+//or io::write trait so can use write! macro
+//or setup with the "log" crate?
+//https://doc.rust-lang.org/std/macro.write.html
+
 /// Prints a message to the emulator's debug window.
 /// 
 /// Works in NO$GBA, melonDS and DeSmuME.
