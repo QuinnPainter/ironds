@@ -27,7 +27,6 @@ impl<T> NdsMutex<T> {
     }
 
     #[inline]
-    #[must_use]
     pub fn lock(&self) -> MutexGuard<'_, T> {
         if self.locked.swap(true) {
             panic!("Tried to lock a mutex that was already locked");
