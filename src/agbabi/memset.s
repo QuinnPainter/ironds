@@ -9,7 +9,7 @@
  Support:
     __agbabi_wordset4, __agbabi_lwordset4
 
- Copyright (C) 2021-2022 agbabi contributors
+ Copyright (C) 2021-2023 agbabi contributors
  For conditions of distribution and use, see copyright notice in LICENSE.md
 
 ===============================================================================
@@ -89,10 +89,11 @@ __agbabi_lwordset4:
     strge   r2, [r0], #4
     bxeq    lr
 
-5: // Lset_tail3
-    joaobapt_test r1
-    strhcs  r2, [r0], #2
-    strbmi  r2, [r0]
+    adds    r1, r1, #4
+5: // .Lset_tail3
+    subs    r1, r1, #1
+    strbge  r2, [r0], #1
+    bgt     5b
     bx      lr
 
     .section .iwram.memset, "ax", %progbits
