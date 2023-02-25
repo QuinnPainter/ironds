@@ -1,4 +1,5 @@
 pub mod console;
+pub mod obj;
 mod vram;
 pub use vram::*;
 
