@@ -1,10 +1,10 @@
 //! Module that provides a simple way to draw text to the screen.
-//! 
+//!
 //! This module is very limited, and should only really be used for debug purposes.
 
-use bitfield_struct::bitfield;
-use crate::{display, mmio};
 use crate::sync::{NdsCell, NdsCellSafe};
+use crate::{display, mmio};
+use bitfield_struct::bitfield;
 
 static DEFAULT_FONT: &[u8; 4096] = include_bytes!("../../gfx/font.img.bin");
 const DEFAULT_PALETTE: [u16; 2] = [display::rgb15(0x000000), display::rgb15(0xFFFFFF)];
@@ -14,13 +14,13 @@ const BYTES_PER_LINE: usize = TILES_PER_LINE * 2;
 #[bitfield(u16)]
 struct CursorPos {
     x: u8,
-    y: u8
+    y: u8,
 }
 unsafe impl NdsCellSafe for CursorPos {}
 static CURSOR_POS: NdsCell<CursorPos> = NdsCell::new(CursorPos::new());
 
 /// Initialises the text console.
-/// 
+///
 /// You must run this function before attempting to `print`.  
 /// Uses the Sub graphics engine, and loads into VRAM block H.
 pub fn init_default() {
@@ -61,19 +61,25 @@ pub fn init_default() {
 
         // load font into sub-bg VRAM
         // vram doesn't support 8 bit loads, must load as 16 bit
-        core::ptr::copy_nonoverlapping(DEFAULT_FONT.as_ptr() as *const u16,
-            mmio::BG_RAM_BASE_SUB as *mut u16, DEFAULT_FONT.len() / 2);
+        core::ptr::copy_nonoverlapping(
+            DEFAULT_FONT.as_ptr() as *const u16,
+            mmio::BG_RAM_BASE_SUB as *mut u16,
+            DEFAULT_FONT.len() / 2,
+        );
 
         // load palette into sub-bg palette RAM
-        core::ptr::copy_nonoverlapping(DEFAULT_PALETTE.as_ptr(),
-            mmio::PALETTE_RAM_BASE_SUB as *mut u16, DEFAULT_PALETTE.len());
+        core::ptr::copy_nonoverlapping(
+            DEFAULT_PALETTE.as_ptr(),
+            mmio::PALETTE_RAM_BASE_SUB as *mut u16,
+            DEFAULT_PALETTE.len(),
+        );
     }
 
     set_cursor_pos(0, 0);
 }
 
 /// Prints some text to the screen.
-/// 
+///
 /// When text reaches the right edge of the screen, it will wrap around to the left side and move to the next line.  
 /// Make sure you have initialised the console before running this function.
 pub fn print(txt: &str) {

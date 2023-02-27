@@ -23,19 +23,19 @@ use core::fmt::Write;
 #[cfg_attr(feature = "arm9", link_section = ".dtcm.alloc")]
 static mut ALLOCATOR: allocator::ACSLAlloc = allocator::ACSLAlloc::new();
 
-pub mod runtime;
-pub mod nocash;
-pub mod interrupt;
+pub mod agbabi;
 pub mod allocator;
 #[cfg(feature = "arm9")]
 pub mod display;
-pub mod timers;
-pub mod mmio;
-pub mod agbabi;
-pub mod syscall;
-pub mod shared;
 pub mod input;
+pub mod interrupt;
+pub mod mmio;
+pub mod nocash;
+pub mod runtime;
+pub mod shared;
 pub mod sync;
+pub mod syscall;
+pub mod timers;
 
 // Accessing variables from the linkerscript is weird.
 // https://stackoverflow.com/questions/72820626/how-to-access-a-variable-from-linker-script-in-rust-code?noredirect=1&lq=1

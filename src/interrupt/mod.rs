@@ -4,11 +4,11 @@
 // https://github.com/embassy-rs/atomic-polyfill
 // or could provide a custom impl for the critical-section crate:
 // https://github.com/embassy-rs/critical-section
-use core::ptr::{read_volatile, write_volatile};
-use core::arch::global_asm;
-use bitflags::bitflags;
 use crate::mmio;
 use crate::sync::{NdsCell, NdsCellSafe};
+use bitflags::bitflags;
+use core::arch::global_asm;
+use core::ptr::{read_volatile, write_volatile};
 
 global_asm! {
     include_str!("irq_handler.s"),
@@ -28,7 +28,7 @@ pub fn disable_ime() {
 }
 
 /// Checks if the Interrupt Master Enable is currently enabled.
-/// 
+///
 /// Returns `false` if interrupts are disabled, `true` if they are enabled.
 #[inline(always)]
 pub fn read_ime() -> bool {
@@ -36,11 +36,11 @@ pub fn read_ime() -> bool {
 }
 
 /// Prevents interrupts from occuring during a certain block of code.
-/// 
+///
 /// Use this if you have some timing critical code, or if you need to manipulate some static data
 /// and need it to be thread-safe.
 /// # Examples
-/// 
+///
 /// ```
 /// critical_section!({
 ///     // important code here
@@ -83,9 +83,9 @@ pub enum IRQType {
     // Could maybe be used to detect cartridge removal.
     CartIREQ = 20,
     GeometryFIFO = 21, // ARM9 only
-    Lid = 22, // ARM7 only
-    SPI = 23, // ARM7 only
-    Wifi = 24, // ARM7 only
+    Lid = 22,          // ARM7 only
+    SPI = 23,          // ARM7 only
+    Wifi = 24,         // ARM7 only
 }
 
 bitflags! {
@@ -157,7 +157,7 @@ pub fn irq_disable(flags: IRQFlags) {
 }
 
 /// Wait for an interrupt to occur, then continue.
-/// 
+///
 /// Waits for one of the interrupts specified in `flags` to happen.  
 /// Make sure interrupts are enabled before calling this!
 pub fn wait_for_interrupt(flags: IRQFlags) {
@@ -166,7 +166,7 @@ pub fn wait_for_interrupt(flags: IRQFlags) {
 }
 
 /// Waits for the VBlank interrupt, then continues.
-/// 
+///
 /// Equivalent to `wait_for_interrupt(IRQFlags::VBLANK)`.  
 /// Make sure interrupts are enabled before calling this!
 pub fn wait_for_vblank() {

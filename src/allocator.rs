@@ -1,8 +1,8 @@
 //! Module that provides a global allocator.
-//! 
+//!
 //! Implements memory allocation and deallocation so you can use `alloc` things,
 //! like [`Vec`](mod@alloc::vec) and [`String`](alloc::string).
-//! 
+//!
 //! NOTE: This technically doesn't actually implement the GlobalAlloc spec properly.  
 //! The alignment factor given in the Layout is ignored, and all allocations are 32-bit aligned.  
 //! I can't think of a reason something would need more than 32-bit alignment, so hopefully this is fine?
@@ -19,15 +19,15 @@
 // LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
 // ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-use core::arch::asm;
-use core::alloc::{GlobalAlloc, Layout};
-use core::ptr;
 use crate::interrupt::critical_section;
+use core::alloc::{GlobalAlloc, Layout};
+use core::arch::asm;
+use core::ptr;
 
 pub(crate) struct ACSLAlloc {
     free_list: *mut u8, // Pointer to the beginning of the free list. (can change)
-    heap_end: *mut u8, // pointer to the end of the heap (never changes)
-    heap_size: usize, // size of the heap in bytes (never changes)
+    heap_end: *mut u8,  // pointer to the end of the heap (never changes)
+    heap_size: usize,   // size of the heap in bytes (never changes)
 }
 
 // this is required for the allocator to be static
@@ -85,7 +85,7 @@ unsafe impl GlobalAlloc for ACSLAlloc {
 
             "3:", // gmFoundRoom
                 "beq    4f",        // Fits exactly; this block disappears
-            
+
                 // Shrink block; R3 holds where the shrunk free block should be
                 "sub    r12,r2,4",  // used to check if block length is 4
                 "cmp    r3,r12",    // is it?
@@ -101,7 +101,7 @@ unsafe impl GlobalAlloc for ACSLAlloc {
 
             "4:", // gmVanishBlock
                 // Remove this block.
-            
+
                 "ldrh   r0,[r4]",   // Get flag in bit 0 (reusing R0 here)
                 "and    r0,1",      // Isolate it
                 "bic    r1,1",      // Clear flag in pointer to next
@@ -130,17 +130,17 @@ unsafe impl GlobalAlloc for ACSLAlloc {
             asm!(
                 // Check the free block list, to see what blocks we need to modify.
                 // The error checks have been disabled for speed.
-            
+
                 "adds   r1,3",       // Round up to a multiple of 4 part 1/2
                 "bcs    6f",         // If carry then len was > FFFFFFFC
                                      // and would cause a wraparound -> Err
                 "bics   r1,3",       // Round up to 4-byte multiple part 2/2
                 "beq    6f",         // Zero size -> Return
-            
+
                 "add    r1,r0",      // R1 = end of block to free
                 "bcs    6f",         // An overflow here would be a tragedy.
                 "mov    r2,r5",
-            
+
                 // Keep a delayed pointer and follow the chain
             "2:",
                 "mov    r3,r2",      // R3 = Delayed pointer to cur.free blk
@@ -151,15 +151,15 @@ unsafe impl GlobalAlloc for ACSLAlloc {
                 // It's impossible under normal conditions that r1 > HeapEnd
                 // therefore the check that r1 <= r2 suffices for termination,
                 // no need to check for HeapEnd.
-            
+
                 // We need to add a block between the previous block (in R3)
                 // and the current block (in R2).
-            
+
                 // First, check if there's a block before us that is contiguous
                 // to us. If so, it needs to be extended rather than creating one.
                 "cmp    r3,r5",      // is there a previous block?
                 "beq    3f",         // if not, we don't need to merge it
-            
+
                 // Previous block present. Check if we need to add ourselves
                 // to it, by checking if the end of the block = ourselves.
                 // If not, we need to create a new one too.
@@ -167,27 +167,27 @@ unsafe impl GlobalAlloc for ACSLAlloc {
                 "tst    r4,1",       // set?
                 "add    r4,r3,4",    // prepare end = start + 4
                 "ldrne  r4,[r4]",    // read ptr to last if bit set
-    
+
                 // We now have the end of the previous block in R4; if it
                 // doesn't equal the block to free, create a new one.
                 "cmp    r4,r0",       // does the block end at this one?
                 "moveq  r0,r3",       // move block pointer if so
                 "beq    4f",          // don't create new block if so
-            
+
                 // Create a new head
             "3:", // fmNoMergeHead
                 "ldrh   r4,[r3]",     // get previous islarge flag
                 "and    r4,1",        // isolate it
                 "orr    r4,r0",       // merge flag w/ initial block address
                 "str    r4,[r3]",     // update last block's next ptr to point to us
-            
+
             "4:", // fmCheckLast
                 "mov    r5,r12",
                 "cmp    r2,r5",       // if next = HeapEnd, don't merge
                 "beq    5f",
                 "cmp    r1,r2",       // are we touching the next block?
                 "beq    7f",          // merge both if so
-            
+
                 // Adjust islarge in R2 and store it in [R0], and R1 in [R0+4].
             "5:", // fmNoMergeTail
                 "sub    r4,r1,4",     // use r4 to not need to restore r1
@@ -198,7 +198,7 @@ unsafe impl GlobalAlloc for ACSLAlloc {
                 "b      9f",
             "6:", // fmError
                 "b      9f",          // maybe this should panic instead of just exiting?
-            
+
             "7:", // fmMergeTail
                 "ldr    r3,[r2]",     // Grab next block's next ptr
                 "tst    r3,1",        // Do the usual dance to get Last

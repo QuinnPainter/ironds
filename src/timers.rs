@@ -1,8 +1,8 @@
 //! Module for utilising the hardware timers.
 #![allow(dead_code)] // for unused consts like PRESCALER_64
 
-use core::ptr;
 use crate::mmio;
+use core::ptr;
 
 // DS timers are the same as GBA, just incrementing at 33 MHz
 // https://problemkaputt.de/gbatek.htm#gbatimers
@@ -21,7 +21,7 @@ const TIMER_STOP: u16 = 0;
 const TIMER_START: u16 = 0x80;
 
 /// Starts a profiler timer, used to measure code execution time.
-/// 
+///
 /// Uses 2 cascading hardware timers for a 32 bit resolution.
 /// The input is the index of the first timer (0-2).
 pub fn start_profiler_timer(timer_index: u32) {
@@ -39,7 +39,7 @@ pub fn start_profiler_timer(timer_index: u32) {
 }
 
 /// Ends a profiler timer, and returns the time taken.
-/// 
+///
 /// Make sure to pass in the same timer index used for [`start_profiler_timer`].
 pub fn end_profiler_timer(timer_index: u32) -> u32 {
     debug_assert!(timer_index <= 2, "invalid timer index for end_profiler_timer (must be 0 to 2)");

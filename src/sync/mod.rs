@@ -1,6 +1,6 @@
 //! Module that provides useful constructs for safe global state.
-mod mutex;
 mod cell;
+mod mutex;
 
-pub use mutex::*;
 pub use cell::*;
+pub use mutex::*;

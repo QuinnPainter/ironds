@@ -15,19 +15,19 @@ use core::{
     cell::UnsafeCell,
     fmt::Debug,
     mem::{align_of, size_of},
-    num::{NonZeroI32, NonZeroI16, NonZeroI8, NonZeroU32, NonZeroU16, NonZeroU8},
+    num::{NonZeroI16, NonZeroI32, NonZeroI8, NonZeroU16, NonZeroU32, NonZeroU8},
 };
 
 /// A NDS-specific wrapper around Rust's [`UnsafeCell`](core::cell::UnsafeCell)
 /// type.
-/// 
+///
 /// Allows data to be safely shared between the main program and the interrupt handler.
-/// 
+///
 /// Supports any data type that implements the [`NdsCellSafe`] marker trait.
 ///
 /// Based on [`GbaCell`](https://docs.rs/gba/latest/gba/gba_cell/struct.GbaCell.html)
 /// from rust-console/gba.
-/// 
+///
 /// ## Safety Logic
 ///
 /// * LLVM thinks that ARMv4T / ARMv5TE only supports atomic operations via special atomic
@@ -153,10 +153,10 @@ where T: NdsCellSafe {
 impl<T> NdsCell<T>
 where T: NdsCellSwapSafe {
     /// Writes a new value in, and returns the old value.
-    /// 
+    ///
     /// Different to just doing a `read` followed by a `write`, since this function
     /// performs the operation atomically using a single `swp` instruction.
-    /// 
+    ///
     /// This makes the function useful for operations that must be atomic, such as
     /// cross-thread communication with mutexes.
     #[cfg_attr(feature = "arm9", link_section = ".itcm.nds_cell_swap")]
@@ -249,14 +249,14 @@ unsafe impl NdsCellSafe for u8 {}
 ///
 /// When implemented in conjunction with [`NdsCellSafe`], this allows a type to use
 /// the `swap` function in [`NdsCell`].
-/// 
+///
 /// A seperate trait is required for this because this function uses the `swp`
 /// and `swpb` ARM instructions, which are only available for 32 bit and 8 bit values.
 ///
 /// Therefore, any 32 bit / 8 bit types (u8, u32, function pointers, etc.) should
 /// impl both NdsCellSafe and NdsCellSwapSafe, while 16 bit types should impl
 /// only NdsCellSafe.
-/// 
+///
 /// ## Safety
 /// All the same rules as [`NdsCellSafe`] apply, in addition the type must be either 32 bit or 8 bit.
 pub unsafe trait NdsCellSwapSafe: NdsCellSafe {}

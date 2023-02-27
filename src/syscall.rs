@@ -1,5 +1,5 @@
 //! Wrappers for the builtin BIOS functions.
-//! 
+//!
 //! They should generally not be called directly, but through the wrappers provided in other modules.  
 //! See <https://problemkaputt.de/gbatek.htm#biosfunctions>
 // todo: is it okay to allow these to inline? is rust smart enough to inline for thumb code, but not for arm?

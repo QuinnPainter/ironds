@@ -1,7 +1,7 @@
 //! Module that provides the addressess of various hardware registers.
 #![allow(missing_docs)] // can remove this when all are voladdresses
 
-use voladdress::{VolAddress, VolBlock, Safe};
+use voladdress::{Safe, VolAddress, VolBlock};
 
 // thanks rust-console/gba, this is a good idea!
 macro_rules! def_mmio {

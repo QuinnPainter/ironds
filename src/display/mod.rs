@@ -3,9 +3,10 @@ pub mod obj;
 mod vram;
 pub use vram::*;
 
-use core::ptr::{read_volatile, write_volatile};
-use bitflags::bitflags;
+use crate::mmio;
 use bitfield_struct::bitfield;
+use bitflags::bitflags;
+use core::ptr::{read_volatile, write_volatile};
 use voladdress::*;
 use crate::mmio;
 
@@ -22,7 +23,7 @@ bitflags! {
         const RENDER_3D = 1 << 2;
         const GEOMETRY_3D = 1 << 3;
         const ALL_2D = Self::MAIN_2D.bits() | Self::SUB_2D.bits();
-        const ALL = Self::ALL_2D.bits() | Self::RENDER_3D.bits() | Self::GEOMETRY_3D.bits(); 
+        const ALL = Self::ALL_2D.bits() | Self::RENDER_3D.bits() | Self::GEOMETRY_3D.bits();
     }
 }
 
@@ -32,8 +33,8 @@ pub struct DisplayControlMain {
     pub bg_mode: u8, // enum
     pub bg0_3d: bool,
     pub tile_obj_mapping: bool, // enum
-    pub bm_obj_2d_dim: bool, // enum
-    pub bm_obj_mapping: bool, // enum
+    pub bm_obj_2d_dim: bool,    // enum
+    pub bm_obj_mapping: bool,   // enum
     pub forced_blank: bool,
     pub display_bg0: bool,
     pub display_bg1: bool,
@@ -66,8 +67,8 @@ pub struct DisplayControlSub {
     pub bg_mode: u8, // enum (different)
     _p: bool,
     pub tile_obj_mapping: bool, // enum
-    pub bm_obj_2d_dim: bool, // enum
-    pub bm_obj_mapping: bool, // enum
+    pub bm_obj_2d_dim: bool,    // enum
+    pub bm_obj_mapping: bool,   // enum
     pub forced_blank: bool,
     pub display_bg0: bool,
     pub display_bg1: bool,
@@ -143,7 +144,7 @@ pub fn set_engine_lcd(pos: MainEnginePos) {
 }
 
 /// Sets the master brightness for one of the graphics engines.
-/// 
+///
 /// Brightness value can be from -16 to 16 (0 is default)  
 /// This doesn't set the backlight brightness, only applies a "colour correction"  
 /// -16 is pure black, 16 is pure white
@@ -213,7 +214,7 @@ pub fn get_sub_bg_control(bg: usize) -> BackgroundControl {
 }
 
 /// Set the screen line that the VCounter is triggered for.
-/// 
+///
 /// Valid values are from 0 to 262.
 /// 0 is the top of the screen, 191 is the bottom.
 /// 192 to 262 are during VBlank.

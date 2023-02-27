@@ -1,7 +1,7 @@
-use core::ptr::{write_volatile, read_volatile};
-use bitfield_struct::bitfield;
 use super::GfxEngine;
 use crate::mmio;
+use bitfield_struct::bitfield;
+use core::ptr::{read_volatile, write_volatile};
 
 // https://problemkaputt.de/gbatek.htm#lcdobjoverview
 // https://problemkaputt.de/gbatek.htm#dsvideoobjs
@@ -34,7 +34,7 @@ pub struct NormalSprite {
     pub priority: u8,
     #[bits(4)]
     pub palette: u8,
-    _p: u16
+    _p: u16,
 }
 
 #[bitfield(u64)]
@@ -61,7 +61,7 @@ pub struct AffineSprite {
     pub priority: u8,
     #[bits(4)]
     pub palette: u8,
-    _p: u16
+    _p: u16,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -76,7 +76,7 @@ pub fn set_sprite(engine: GfxEngine, index: u8, sprite: Sprite) {
 
     let obj_data = match sprite {
         Sprite::NormalSprite(s) => u64::from(s) & !AFFINE_FLAG,
-        Sprite::AffineSprite(s) => u64::from(s) | AFFINE_FLAG
+        Sprite::AffineSprite(s) => u64::from(s) | AFFINE_FLAG,
     };
     unsafe {
         // Writes OBJ Attributes 0 and 1
@@ -95,7 +95,7 @@ pub fn get_sprite(engine: GfxEngine, index: u8) -> Sprite {
         // Reads OBJ Attributes 0 and 1
         obj_data = read_volatile(oam_addr as *const u32) as u64;
         // Reads OBJ Attribute 2
-        obj_data |= (read_volatile((oam_addr + 4) as *const u16) as u64) << 32; 
+        obj_data |= (read_volatile((oam_addr + 4) as *const u16) as u64) << 32;
     }
     if obj_data & AFFINE_FLAG > 0 {
         Sprite::AffineSprite(AffineSprite::from(obj_data))
@@ -110,7 +110,7 @@ const fn get_oam_addr(engine: GfxEngine, index: u8) -> usize {
 
     let oam_addr = match engine {
         GfxEngine::MAIN => mmio::OAM_BASE_MAIN,
-        GfxEngine::SUB => mmio::OAM_BASE_SUB
+        GfxEngine::SUB => mmio::OAM_BASE_SUB,
     };
     oam_addr + (index * 8) as usize // 8 bytes of stride between entries
 }

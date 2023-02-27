@@ -2,8 +2,8 @@
 
 // See the "Debug Messages" section of the NO$GBA help for more detail.
 // (the website is outdated, view it in the actual app)
-use core::arch::asm;
 use crate::mmio;
+use core::arch::asm;
 
 //todo: setup nocash write and graphical console write with fmt::write
 //or io::write trait so can use write! macro
@@ -11,11 +11,11 @@ use crate::mmio;
 //https://doc.rust-lang.org/std/macro.write.html
 
 /// Prints a message to the emulator's debug window.
-/// 
+///
 /// Works in NO$GBA, melonDS and DeSmuME.
 #[instruction_set(arm::a32)]
 #[inline(never)]
-pub fn print (s: &str) {
+pub fn print(s: &str) {
     for chunk in s.as_bytes().chunks(100) {
         unsafe {
             asm!(
@@ -45,20 +45,20 @@ pub fn print (s: &str) {
 }
 
 /// Prints a message to the emulator's debug window.
-/// 
+///
 /// Works in NO$GBA and (soon?) melonDS.
 /// You should probably use "print" instead, as it is more compatible. This is just included for posterity.
-pub fn print2 (s: &str) {
+pub fn print2(s: &str) {
     for b in s.bytes() {
         mmio::NOCASH_CHAROUT.write(b as u32);
     }
 }
 
 /// A code breakpoint that will pause the emulator when it is executed.
-/// 
+///
 /// Works in NO$GBA.
 // Works in both ARM and THUMB mode.
-pub macro breakpoint () {
+pub macro breakpoint() {
     unsafe {
         asm!(
             "mov r11, r11",

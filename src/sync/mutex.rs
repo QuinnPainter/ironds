@@ -1,10 +1,10 @@
+use crate::sync::NdsCell;
 use core::cell::UnsafeCell;
 use core::ops::{Deref, DerefMut};
-use crate::sync::NdsCell;
 
 pub struct NdsMutex<T> {
     locked: NdsCell<bool>,
-    data: UnsafeCell<T>
+    data: UnsafeCell<T>,
 }
 unsafe impl<T> Send for NdsMutex<T> {}
 unsafe impl<T> Sync for NdsMutex<T> {}
@@ -15,7 +15,7 @@ impl<T> NdsMutex<T> {
     pub const fn new(in_data: T) -> Self {
         Self {
             locked: NdsCell::new(false),
-            data: UnsafeCell::new(in_data)
+            data: UnsafeCell::new(in_data),
         }
     }
 

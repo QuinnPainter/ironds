@@ -1,9 +1,9 @@
 //! Module for button input and touchscreen.
 #![allow(unused_imports)]
 
-use core::ptr;
+use crate::{mmio, shared};
 use bitflags::bitflags;
-use crate::{shared, mmio};
+use core::ptr;
 
 bitflags! {
     #[repr(transparent)]
@@ -32,7 +32,7 @@ bitflags! {
 }
 
 /// Reads the button state, and updates the shared button state.
-/// 
+///
 /// Only usable on ARM7.
 #[cfg(feature = "arm7")]
 pub fn scan_keys() {

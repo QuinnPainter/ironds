@@ -20,6 +20,6 @@ fn main() {
     add_link_script!("arm9_link.ld");
     #[cfg(feature = "arm7")]
     add_link_script!("arm7_link.ld");
-    
+
     // todo: add "rerun-if-changed" statements here so the build.rs only gets rebuilt when necessary
 }

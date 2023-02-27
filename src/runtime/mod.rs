@@ -1,5 +1,5 @@
 //! The startup runtime that runs before the `main` function.
-//! 
+//!
 //! Also known as "rt0". Does things like initialise variables, copy your stuff
 //! into ITCM / DTCM / IWRAM, and initialise hardware registers.
 
