@@ -8,7 +8,6 @@ use bitfield_struct::bitfield;
 use bitflags::bitflags;
 use core::ptr::{read_volatile, write_volatile};
 use voladdress::*;
-use crate::mmio;
 
 #[cfg(feature = "arm9")]
 const POWCNT1: VolAddress<u32, Safe, Safe> = unsafe { VolAddress::new(mmio::POWCNT1) };
