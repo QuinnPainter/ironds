@@ -7,6 +7,7 @@ use core::ptr::{read_volatile, write_volatile};
 // https://problemkaputt.de/gbatek.htm#dsvideoobjs
 
 const AFFINE_FLAG: u64 = 1 << 8;
+pub const DISABLED_SPRITE: Sprite = Sprite::NormalSprite(NormalSprite::new().with_disable(true));
 
 #[bitfield(u64)]
 #[derive(PartialEq, Eq)]
