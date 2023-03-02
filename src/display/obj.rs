@@ -113,5 +113,6 @@ const fn get_oam_addr(engine: GfxEngine, index: u8) -> usize {
         GfxEngine::MAIN => mmio::OAM_BASE_MAIN,
         GfxEngine::SUB => mmio::OAM_BASE_SUB,
     };
-    oam_addr + (index * 8) as usize // 8 bytes of stride between entries
+    let index = index as usize;
+    oam_addr + (index * 8) // 8 bytes of stride between entries
 }
