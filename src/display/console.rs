@@ -70,7 +70,7 @@ pub fn init_default() {
         // load palette into sub-bg palette RAM
         core::ptr::copy_nonoverlapping(
             DEFAULT_PALETTE.as_ptr(),
-            mmio::PALETTE_RAM_BASE_SUB as *mut u16,
+            mmio::BG_PALETTE_RAM_BASE_SUB as *mut u16,
             DEFAULT_PALETTE.len(),
         );
     }

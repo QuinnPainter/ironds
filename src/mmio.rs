@@ -88,8 +88,10 @@ pub const DISPCAPCNT: usize = 0x04000064;
 #[cfg(feature = "arm9")]
 pub const DISP_MMEM_FIFO: usize = 0x04000068;
 
-pub const PALETTE_RAM_BASE_MAIN: usize = 0x05000000;
-pub const PALETTE_RAM_BASE_SUB: usize = 0x05000400;
+pub const BG_PALETTE_RAM_BASE_MAIN: usize = 0x05000000;
+pub const OBJ_PALETTE_RAM_BASE_MAIN: usize = 0x05000200;
+pub const BG_PALETTE_RAM_BASE_SUB: usize = 0x05000400;
+pub const OBJ_PALETTE_RAM_BASE_SUB: usize = 0x05000600;
 pub const BG_RAM_BASE_MAIN: usize = 0x06000000;
 pub const BG_RAM_BASE_SUB: usize = 0x06200000;
 pub const OBJ_RAM_BASE_MAIN: usize = 0x06400000;
