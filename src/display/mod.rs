@@ -108,11 +108,13 @@ pub struct BackgroundControl {
     pub screen_size: u8,
 }
 
+#[derive(Clone, Copy)]
 pub enum MainEnginePos {
     TOP = 1 << 15,
     BOTTOM = 0,
 }
 
+#[derive(Clone, Copy)]
 pub enum GfxEngine {
     MAIN = 0,
     SUB = 0x1000,
