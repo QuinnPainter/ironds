@@ -10,7 +10,7 @@ publish = false # remove this when adding to crates.io
 [dependencies]
 voladdress = { version = "1" }
 bitflags = { version = "2" }
-bitfield-struct = "0.3"
+bitfield-struct = "0.4.1"
 
 [features]
 arm9 = []
