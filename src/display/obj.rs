@@ -68,10 +68,10 @@ pub struct AffineSprite {
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct AffineParameter {
-    pa: fixed::types::I8F8,
-    pb: fixed::types::I8F8,
-    pc: fixed::types::I8F8,
-    pd: fixed::types::I8F8,
+    pub pa: fixed::types::I8F8,
+    pub pb: fixed::types::I8F8,
+    pub pc: fixed::types::I8F8,
+    pub pd: fixed::types::I8F8,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
