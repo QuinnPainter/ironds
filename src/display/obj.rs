@@ -65,6 +65,15 @@ pub struct AffineSprite {
     _p: u16,
 }
 
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct AffineParameter {
+    pa: fixed::types::I8F8,
+    pb: fixed::types::I8F8,
+    pc: fixed::types::I8F8,
+    pd: fixed::types::I8F8,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Sprite {
     NormalSprite(NormalSprite),
@@ -105,6 +114,32 @@ pub fn get_sprite(engine: GfxEngine, index: u8) -> Sprite {
     }
 }
 
+#[inline]
+pub fn set_affine_param(engine: GfxEngine, index: u8, param: AffineParameter) {
+    let oam_addr = get_affine_addr(engine, index);
+
+    unsafe {
+        write_volatile(oam_addr as *mut u16, bytemuck::cast(param.pa));
+        write_volatile((oam_addr + 8) as *mut u16, bytemuck::cast(param.pb));
+        write_volatile((oam_addr + 16) as *mut u16, bytemuck::cast(param.pc));
+        write_volatile((oam_addr + 24) as *mut u16, bytemuck::cast(param.pd));
+    }
+}
+
+#[inline]
+pub fn get_affine_param(engine: GfxEngine, index: u8) -> AffineParameter {
+    let oam_addr = get_affine_addr(engine, index);
+
+    unsafe {
+        AffineParameter {
+            pa: bytemuck::cast(read_volatile(oam_addr as *mut u16)),
+            pb: bytemuck::cast(read_volatile((oam_addr + 8) as *mut u16)),
+            pc: bytemuck::cast(read_volatile((oam_addr + 16) as *mut u16)),
+            pd: bytemuck::cast(read_volatile((oam_addr + 24) as *mut u16)),
+        }
+    }
+}
+
 #[inline(always)]
 const fn get_oam_addr(engine: GfxEngine, index: u8) -> usize {
     debug_assert!(index <= 127, "sprite index must be from 0 to 127");
@@ -115,4 +150,16 @@ const fn get_oam_addr(engine: GfxEngine, index: u8) -> usize {
     };
     let index = index as usize;
     oam_addr + (index * 8) // 8 bytes of stride between entries
+}
+
+#[inline(always)]
+const fn get_affine_addr(engine: GfxEngine, index: u8) -> usize {
+    debug_assert!(index <= 31, "sprite affine parameter index must be from 0 to 31");
+
+    let oam_addr = match engine {
+        GfxEngine::MAIN => mmio::OAM_BASE_MAIN,
+        GfxEngine::SUB => mmio::OAM_BASE_SUB,
+    };
+    let index = index as usize;
+    oam_addr + 6 + (index * 32)
 }

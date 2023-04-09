@@ -8,9 +8,11 @@ publish = false # remove this when adding to crates.io
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-voladdress = { version = "1" }
-bitflags = { version = "2" }
+voladdress = "1.3"
+bitflags = "2"
 bitfield-struct = "0.4.1"
+fixed = "1.23"
+bytemuck = "1.13"
 
 [features]
 arm9 = []

@@ -86,6 +86,7 @@ extern "C" fn lib_init() {
 fn panic(info: &core::panic::PanicInfo) -> ! {
     // concat! doesn't like const strings, this works as a workaround
     macro_rules! ERR_HEADER { () => { "      ---- ARM9 PANIC ----\n\n" }; }
+    // todo: I don't think there's checking on that insert_str. also should move this string to the stack?
 
     interrupt::disable_ime();
     let mut output: String = String::new();
