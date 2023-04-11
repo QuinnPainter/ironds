@@ -6,6 +6,11 @@
 //! NOTE: This technically doesn't actually implement the GlobalAlloc spec properly.  
 //! The alignment factor given in the Layout is ignored, and all allocations are 32-bit aligned.  
 //! I can't think of a reason something would need more than 32-bit alignment, so hopefully this is fine?
+//! 
+//! FUTURE NOTE: The code has been modified so it is always 64-bit aligned, as I
+//! hit a situation where a 64-bit aligned struct was emitted. Clearly, this approach is not good enough.  
+//! Will need to replace with a proper approach that can handle higher alignment.  
+//! (The struct was repr(C), and had two u64s in it, for future reference)
 
 // Based on the malloc implementation in ACSL: (copied as of 2022-08-27)
 // https://codeberg.org/pgimeno/ACSL/src/branch/master/stdlib/malloc_free.s
@@ -40,18 +45,18 @@ unsafe impl GlobalAlloc for ACSLAlloc {
     #[inline(never)]
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         debug_assert!(!self.free_list.is_null(), "tried to allocate before allocator init");
-        debug_assert!(layout.align() <= 4,
-            "greater than 4 alignment for allocation is not supported (requested alignment={})", layout.align());
+        debug_assert!(layout.align() <= 8,
+            "greater than 8 alignment for allocation is not supported (requested alignment={})", layout.align());
         let allocated_addr: usize;
         critical_section!({
             asm!(
                 // r0 = size of block
                 // Note: malloc will always pass r0 > 4.
 
-                "adds   r0,3",      // Round up to the next multiple of 4
+                "adds   r0,7",      // Round up to the next multiple of 8
                 "bcs    2f",        // If carry then len was > FFFFFFFC
                                     // and would cause a wraparound -> Err
-                "bic    r0,3",      // 4-byte alignment (granularity)
+                "bic    r0,7",      // 8-byte alignment (granularity)
 
                 // R3 = max size
                 "cmp    r0,r3",     // Error if size > max size
@@ -131,10 +136,10 @@ unsafe impl GlobalAlloc for ACSLAlloc {
                 // Check the free block list, to see what blocks we need to modify.
                 // The error checks have been disabled for speed.
 
-                "adds   r1,3",       // Round up to a multiple of 4 part 1/2
+                "adds   r1,7",       // Round up to a multiple of 8 part 1/2
                 "bcs    6f",         // If carry then len was > FFFFFFFC
                                      // and would cause a wraparound -> Err
-                "bics   r1,3",       // Round up to 4-byte multiple part 2/2
+                "bics   r1,7",       // Round up to 8-byte multiple part 2/2
                 "beq    6f",         // Zero size -> Return
 
                 "add    r1,r0",      // R1 = end of block to free
